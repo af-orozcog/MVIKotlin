@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelevent.Ti
 
 sealed class TimeTravelEventsUpdate {
 
-    data class All(val events: List<TimeTravelEvent>) : TimeTravelEventsUpdate()
-    data class New(val events: List<TimeTravelEvent>) : TimeTravelEventsUpdate()
+    data class All(val events: List<List<TimeTravelEvent>>) : TimeTravelEventsUpdate()
+    data class NewList(val events: List<TimeTravelEvent>) : TimeTravelEventsUpdate()
+    data class NewElement(val listIndex: Int, val events: List<TimeTravelEvent>) : TimeTravelEventsUpdate()
 }

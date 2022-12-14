@@ -61,11 +61,11 @@ internal class TimeTravelView(
         renderer.render(model)
     }
 
-    private fun renderEvents(events: List<String>) {
-        val selectedIndex = list.selectedIndex
+    private fun renderEvents(events: List<List<String>>) {
         listModel.clear()
-        events.forEach(listModel::addElement)
-        list.selectedIndex = selectedIndex
+        if(events.isNotEmpty()){
+            events[0].forEach(listModel::addElement)
+        }
         list.updateUI()
     }
 

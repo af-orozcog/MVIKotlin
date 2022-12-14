@@ -12,6 +12,7 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeInt
 internal fun DataWriter.writeTimeTravelStateUpdate(timeTravelStateUpdate: TimeTravelStateUpdate) {
     writeTimeTravelEventsUpdate(timeTravelStateUpdate.eventsUpdate)
     writeInt(timeTravelStateUpdate.selectedEventIndex)
+    writeInt(timeTravelStateUpdate.selectedListEventIndex)
     writeEnum(timeTravelStateUpdate.mode)
 }
 
@@ -19,5 +20,6 @@ internal fun DataReader.readTimeTravelStateUpdate(): TimeTravelStateUpdate =
     TimeTravelStateUpdate(
         eventsUpdate = readTimeTravelEventsUpdate(),
         selectedEventIndex = readInt(),
+        selectedListEventIndex = readInt(),
         mode = readEnum()
     )

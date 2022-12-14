@@ -16,6 +16,7 @@ internal class StateDiff {
             TimeTravelStateUpdate(
                 eventsUpdate = diffEvents(new = state.events, previous = previousState?.events),
                 selectedEventIndex = state.selectedEventIndex,
+                selectedListEventIndex = state.selectedListEventIndex,
                 mode = state.mode.toProto()
             )
 
@@ -24,11 +25,21 @@ internal class StateDiff {
         return update
     }
 
-    private fun diffEvents(new: List<TimeTravelEvent>, previous: List<TimeTravelEvent>?): TimeTravelEventsUpdate =
-        when {
-            previous == null -> TimeTravelEventsUpdate.All(new.toProto())
-            new.size > previous.size -> TimeTravelEventsUpdate.New(new.subList(previous.size, new.size).toProto())
-            new.size == previous.size -> TimeTravelEventsUpdate.New(emptyList())
-            else -> TimeTravelEventsUpdate.All(new.toProto())
+    private fun diffEvents(new: List<List<TimeTravelEvent>>, previous: List<List<TimeTravelEvent>>?): TimeTravelEventsUpdate {
+        if(previous == null){
+            return TimeTravelEventsUpdate.All(new.toProto())
         }
+        else if(new.size > previous.size){
+            return TimeTravelEventsUpdate.NewList(new[new.size-1].toProto())
+        }
+        else if(new.size == previous.size && new[new.size-1].size > previous[new.size-1].size){
+            return TimeTravelEventsUpdate.NewElement(new.size-1,new[new.size-1].subList(previous[new.size-1].size,new[new.size-1].size).toProto())
+        }
+        else if(new.size == previous.size && new[new.size-1].size == previous[new.size-1].size){
+            return TimeTravelEventsUpdate.NewElement(new.size-1,emptyList())
+        }
+        else {
+            return TimeTravelEventsUpdate.All(new.toProto())
+        }
+    }
 }

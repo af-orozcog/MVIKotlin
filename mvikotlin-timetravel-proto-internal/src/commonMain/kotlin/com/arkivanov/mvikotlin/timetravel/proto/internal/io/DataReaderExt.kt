@@ -75,6 +75,23 @@ internal inline fun <T> DataReader.readList(readItem: DataReader.() -> T): List<
         List(it) { readItem() }
     }
 
+internal inline fun <T : Any> DataReader.readListOfList(readItem: DataReader.() -> T) : List<List<T>>? {
+    var ans = listOf<List<T>>(emptyList())
+    readSized {
+        for(i in 1..it){
+            var listToAdd:List<T> = emptyList()
+            readSized {
+                for(j in 1..it){
+                    var toAdd = readItem()
+                    listToAdd = listToAdd + toAdd
+                }
+            }
+            ans = listOf(*ans.toTypedArray(), listToAdd)
+        }
+    }
+    return ans
+}
+
 internal inline fun <K, V> DataReader.readMap(readKey: DataReader.() -> K, readValue: DataReader.() -> V): Map<K, V>? =
     readSized {
         val map = mutableMapOf<K, V>()

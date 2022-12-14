@@ -194,7 +194,7 @@ class TimeTravelToolWindow(
         }
 
         override fun onEventSelected(index: Int) {
-            client.onEventSelected(index = index)
+            client.onEventSelected(listIndex = 0, eventIndex = index)
         }
 
         override fun onSettings() {

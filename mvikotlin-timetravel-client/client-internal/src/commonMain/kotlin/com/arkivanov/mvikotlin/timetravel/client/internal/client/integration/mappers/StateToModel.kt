@@ -21,6 +21,7 @@ private fun emptyModel(buttons: Model.Buttons, errorText: String?): Model =
         events = emptyList(),
         currentEventIndex = -1,
         buttons = buttons,
+        selectedEventListIndex = -1,
         selectedEventIndex = -1,
         selectedEventValue = null,
         errorText = errorText
@@ -28,11 +29,12 @@ private fun emptyModel(buttons: Model.Buttons, errorText: String?): Model =
 
 private fun connectedModel(connection: State.Connection.Connected, errorText: String?): Model =
     Model(
-        events = connection.events.map(TimeTravelEvent::text),
+        events = connection.events.map{ eventList -> eventList.map(TimeTravelEvent::text)},
         currentEventIndex = connection.currentEventIndex,
         buttons = connection.toButtons(),
+        selectedEventListIndex = connection.selectedEventListIndex,
         selectedEventIndex = connection.selectedEventIndex,
-        selectedEventValue = connection.events.getOrNull(connection.selectedEventIndex)?.let { it.value ?: ValueNode(type = "...") },
+        selectedEventValue = connection.events.getOrNull(connection.selectedEventListIndex)?.getOrNull(connection.selectedEventIndex)?.let { it.value ?: ValueNode(type = "...") },
         errorText = errorText
     )
 
@@ -86,7 +88,7 @@ private fun State.Connection.isDebuggableEventSelected(): Boolean =
     when (this) {
         is State.Connection.Disconnected,
         is State.Connection.Connecting -> false
-        is State.Connection.Connected -> events.getOrNull(selectedEventIndex)?.type?.isDebuggable() == true
+        is State.Connection.Connected -> events.getOrNull(selectedEventListIndex)?.getOrNull(selectedEventIndex)?.type?.isDebuggable() == true
     }
 
 private fun StoreEventType.isDebuggable(): Boolean =

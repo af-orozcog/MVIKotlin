@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetraveleventsup
 data class TimeTravelStateUpdate(
     val eventsUpdate: TimeTravelEventsUpdate,
     val selectedEventIndex: Int,
+    val selectedListEventIndex: Int,
     val mode: Mode
 ) : ProtoObject {
 

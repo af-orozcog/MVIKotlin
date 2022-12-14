@@ -8,10 +8,16 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.storeeventtype.Sto
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelevent.TimeTravelEvent as TimeTravelEventProto
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.TimeTravelStateUpdate as TimeTravelStateUpdateProto
 
-internal fun List<TimeTravelEvent>.toProto(): List<TimeTravelEventProto> {
+internal fun List<List<TimeTravelEvent>>.toProto(): List<List<TimeTravelEventProto>> {
     val valueParser = ValueParser()
 
-    return map { it.toProto(valueParser) }
+    return map { list -> list.map{it.toProto(valueParser)}}
+}
+
+internal fun List<TimeTravelEvent>.toProto(): List<TimeTravelEventProto>{
+    val valueParser = ValueParser()
+
+    return map {it.toProto(valueParser)}
 }
 
 private fun TimeTravelEvent.toProto(valueParser: ValueParser): TimeTravelEventProto =
