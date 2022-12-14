@@ -123,7 +123,9 @@ internal class TimeTravelClientStoreFactory(
                     ?.getOrNull(eventIndex)
                     ?.takeIf { it.value == null }
                     ?.id
-                    ?.let(TimeTravelCommand::AnalyzeEvent)
+                    ?.let{
+                        (TimeTravelCommand::AnalyzeEvent)(listIndex,it)
+                    }
             }
         }
     }

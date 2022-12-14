@@ -112,7 +112,7 @@ class TimeTravelServer(
                 is TimeTravelCommand.MoveToEnd -> holder.controller.moveToEnd()
                 is TimeTravelCommand.Cancel -> holder.controller.cancel()
                 is TimeTravelCommand.DebugEvent -> holder.controller.debugEvent(eventId = command.eventId)
-                is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(eventId = command.eventId, holder = holder, socket = socket)
+                is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(listIndex = command.listIndex, eventId = command.eventId, holder = holder, socket = socket)
                 is TimeTravelCommand.ExportEvents -> Unit // Not supported
                 is TimeTravelCommand.ImportEvents -> Unit // Not supported
             }.let {}
@@ -137,8 +137,8 @@ class TimeTravelServer(
     private fun removeHolder(): Holder? =
         holderRef.getAndUpdate { null }?.value
 
-    private fun analyzeEvent(eventId: Long, holder: Holder, socket: Int) {
-        val event = holder.controller.state.events.firstOrNull { it.id == eventId } ?: return
+    private fun analyzeEvent(listIndex: Int, eventId: Long, holder: Holder, socket: Int) {
+        val event = holder.controller.state.events.getOrNull(listIndex)?.firstOrNull { it.id == eventId } ?: return
         val parsedValue = ValueParser().parseValue(event.value)
         holder.sendData(clientSocket = socket, protoObject = TimeTravelEventValue(eventId = eventId, value = parsedValue))
     }

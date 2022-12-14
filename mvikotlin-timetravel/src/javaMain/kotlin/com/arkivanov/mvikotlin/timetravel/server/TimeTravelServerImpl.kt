@@ -104,15 +104,15 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.MoveToEnd -> controller.moveToEnd()
                 is TimeTravelCommand.Cancel -> controller.cancel()
                 is TimeTravelCommand.DebugEvent -> controller.debugEvent(eventId = command.eventId)
-                is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(eventId = command.eventId, sender = sender)
+                is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(listIndex = command.listIndex, eventId = command.eventId, sender = sender)
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
             }.let {}
         }
     }
 
-    private fun analyzeEvent(eventId: Long, sender: Socket) {
-        val event = controller.state.events.firstOrNull { it.id == eventId } ?: return
+    private fun analyzeEvent(listIndex:Int, eventId: Long, sender: Socket) {
+        val event = controller.state.events.getOrNull(listIndex)?.firstOrNull { it.id == eventId } ?: return
         val parsedValue = ValueParser().parseValue(event.value)
         sendData(sender, TimeTravelEventValue(eventId = eventId, value = parsedValue))
     }
