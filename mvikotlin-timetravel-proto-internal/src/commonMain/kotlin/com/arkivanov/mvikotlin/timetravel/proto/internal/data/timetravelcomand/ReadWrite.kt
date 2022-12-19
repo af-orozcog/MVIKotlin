@@ -4,9 +4,11 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.io.DataReader
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.DataWriter
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readByteArray
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readEnum
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readInt
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readLong
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeByteArray
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeEnum
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeInt
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeLong
 
 internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelCommand) {
@@ -26,6 +28,7 @@ internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelComm
 
         is TimeTravelCommand.AnalyzeEvent -> {
             writeEnum(Type.ANALYZE_EVENT)
+            writeInt(timeTravelCommand.listIndex)
             writeLong(timeTravelCommand.eventId)
         }
 
@@ -48,7 +51,7 @@ internal fun DataReader.readTimeTravelCommand(): TimeTravelCommand =
         Type.MOVE_TO_END -> TimeTravelCommand.MoveToEnd
         Type.CANCEL -> TimeTravelCommand.Cancel
         Type.DEBUG_EVENT -> TimeTravelCommand.DebugEvent(eventId = readLong())
-        Type.ANALYZE_EVENT -> TimeTravelCommand.AnalyzeEvent(eventId = readLong())
+        Type.ANALYZE_EVENT -> TimeTravelCommand.AnalyzeEvent(listIndex = readInt(), eventId = readLong())
         Type.EXPORT_EVENTS -> TimeTravelCommand.ExportEvents
         Type.IMPORT_EVENTS -> TimeTravelCommand.ImportEvents(data = readByteArray()!!)
     }

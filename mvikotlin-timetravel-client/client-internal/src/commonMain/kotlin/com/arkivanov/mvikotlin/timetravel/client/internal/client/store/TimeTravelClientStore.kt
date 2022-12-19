@@ -21,7 +21,7 @@ internal interface TimeTravelClientStore : Store<Intent, State, Label> {
         object MoveToEnd : Intent()
         object Cancel : Intent()
         object DebugEvent : Intent()
-        data class SelectEvent(val index: Int) : Intent()
+        data class SelectEvent(val listIndex: Int, val eventIndex: Int) : Intent()
         object ExportEvents : Intent()
         class ImportEvents(val data: ByteArray) : Intent()
         object DismissError : Intent()
@@ -39,9 +39,10 @@ internal interface TimeTravelClientStore : Store<Intent, State, Label> {
             ) : Connection()
 
             data class Connected(
-                val events: List<TimeTravelEvent> = emptyList(),
+                val events: List<List<TimeTravelEvent>> = emptyList(),
                 val currentEventIndex: Int = -1,
                 val mode: TimeTravelStateUpdate.Mode = TimeTravelStateUpdate.Mode.IDLE,
+                val selectedEventListIndex: Int = -1,
                 val selectedEventIndex: Int = -1,
                 /*private*/ internal val disposable: Disposable,
                 /*private*/ internal val writer: (TimeTravelCommand) -> Unit

@@ -17,15 +17,16 @@ interface TimeTravelClient {
     fun onMoveToEndClicked()
     fun onCancelClicked()
     fun onDebugEventClicked()
-    fun onEventSelected(index: Int)
+    fun onEventSelected(listIndex: Int, eventIndex: Int)
     fun onExportEventsClicked()
     fun onImportEventsClicked()
     fun onDismissErrorClicked()
 
     data class Model(
-        val events: List<String>,
+        val events: List<List<String>>,
         val currentEventIndex: Int,
         val buttons: Buttons,
+        val selectedEventListIndex: Int,
         val selectedEventIndex: Int,
         val selectedEventValue: ValueNode?,
         val errorText: String?

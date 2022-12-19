@@ -81,8 +81,8 @@ class TimeTravelClientComponent(
         store.accept(Intent.DebugEvent)
     }
 
-    override fun onEventSelected(index: Int) {
-        store.accept(Intent.SelectEvent(index = index))
+    override fun onEventSelected(listIndex: Int, eventIndex: Int) {
+        store.accept(Intent.SelectEvent(listIndex = listIndex, eventIndex = eventIndex))
     }
 
     override fun onExportEventsClicked() {

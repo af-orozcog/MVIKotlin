@@ -75,6 +75,20 @@ interface TimeTravelController {
     fun cancel()
 
     /**
+     * Exports all recorded events and [Store] states into a serializable format
+     */
+    @MainThread
+    fun export(): TimeTravelExport
+
+    /**
+     * Sets current mode to [TimeTravelState.Mode.STOPPED] and applies the exported data
+     *
+     * @param export a previously exported data to by applied
+     */
+    @MainThread
+    fun import(export: TimeTravelExport)
+
+    /**
      * Fires a [TimeTravelEvent] allowing its debugging.
      * Please note that events of type [StoreEventType.STATE] can not be debugged.
      * - If event type is [StoreEventType.INTENT] or [StoreEventType.ACTION], executes the [Executor] of the appropriate Store.
@@ -90,18 +104,4 @@ interface TimeTravelController {
      */
     @MainThread
     fun debugEvent(eventId: Long)
-
-    /**
-     * Exports all recorded events and [Store] states into a serializable format
-     */
-    @MainThread
-    fun export(): TimeTravelExport
-
-    /**
-     * Sets current mode to [TimeTravelState.Mode.STOPPED] and applies the exported data
-     *
-     * @param export a previously exported data to by applied
-     */
-    @MainThread
-    fun import(export: TimeTravelExport)
 }

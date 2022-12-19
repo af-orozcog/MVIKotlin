@@ -48,11 +48,10 @@ internal class TimeTravelControllerImpl : TimeTravelController {
 
     private fun addStore(store: TimeTravelStore<*, *, *>, name: String) {
         stores[name] = store
-
         store.events(
             observer(
                 onComplete = { stores -= name },
-                onNext = { onEvent(TimeTravelEvent(id = eventId++, storeName = name, type = it.type, value = it.value, state = it.state)) }
+                onNext = { onEvent(state.selectedListEventIndex,TimeTravelEvent(id = eventId++, storeName = name, type = it.type, value = it.value, state = it.state)) }
             )
         )
     }
@@ -85,7 +84,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            move(state.events, state.selectedEventIndex, -1)
+            move(state.events, state.selectedListEventIndex, state.selectedEventIndex, -1)
         }
     }
 
@@ -93,7 +92,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            step(state.events, state.selectedEventIndex, false)
+            step(state.events, state.selectedListEventIndex, state.selectedEventIndex, false)
         }
     }
 
@@ -101,7 +100,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            step(state.events, state.selectedEventIndex, true)
+            step(state.events, state.selectedListEventIndex, state.selectedEventIndex, true)
         }
     }
 
@@ -109,7 +108,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            move(state.events, state.selectedEventIndex, state.events.lastIndex)
+            move(state.events, state.selectedListEventIndex, state.selectedEventIndex, state.events.lastIndex)
         }
     }
 
@@ -133,7 +132,15 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            val event = state.events.firstOrNull { it.id == eventId } ?: return
+            var event: TimeTravelEvent? = null
+            for(timeEvent in state.events[state.selectedListEventIndex]){
+                if(timeEvent.id == eventId){
+                    event = timeEvent
+                    break
+                }
+            }
+
+            if(event == null) return
             stores[event.storeName]?.debug(type = event.type, value = event.value, state = event.state)
         }
     }
@@ -142,7 +149,12 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
         require(state.mode === Mode.STOPPED)
 
-        val usedStoreNames = state.events.mapTo(HashSet(), TimeTravelEvent::storeName)
+        val usedStoreNames = HashSet<String>()
+        for(list in state.events){
+            for(event in list){
+                usedStoreNames.add(event.storeName)
+            }
+        }
 
         return TimeTravelExport(
             recordedEvents = state.events,
@@ -164,10 +176,21 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         }
     }
 
-    private fun onEvent(event: TimeTravelEvent) {
+    private fun addEvent(listIndex: Int, event: TimeTravelEvent, events : List<List<TimeTravelEvent>>): List<List<TimeTravelEvent>> {
+        val helperFun = fun(index: Int, list: List<TimeTravelEvent>):List<TimeTravelEvent> {
+            var temp = list
+            if(index == listIndex){
+              temp = temp + event
+            }
+            return temp
+        }
+        return events.mapIndexed{ index: Int, list: List<TimeTravelEvent> -> helperFun(index,list)}
+    }
+
+    private fun onEvent(listIndex: Int, event: TimeTravelEvent) {
         when (state.mode) {
             Mode.RECORDING -> {
-                swapState { it.copy(events = it.events + event, selectedEventIndex = it.events.size) }
+                swapState { it.copy(events = addEvent(listIndex, event, it.events), selectedEventIndex = it.events.size) }
                 process(event)
             }
 
@@ -182,7 +205,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         }.let {}
     }
 
-    private fun step(events: List<TimeTravelEvent>, from: Int, isForward: Boolean) {
+    private fun step(events: List<List<TimeTravelEvent>>, listIndex: Int, from: Int, isForward: Boolean) {
         val progression =
             if (isForward) {
                 (from + 1)..events.lastIndex
@@ -191,15 +214,15 @@ internal class TimeTravelControllerImpl : TimeTravelController {
             }
 
         for (i in progression) {
-            val item = events.getOrNull(i)
+            val item = events.getOrNull(listIndex)?.getOrNull(i)
             if ((item == null) || (item.type === StoreEventType.STATE)) {
-                move(events, from, i)
+                move(events, listIndex, from, i)
                 break
             }
         }
     }
 
-    private fun move(events: List<TimeTravelEvent>, from: Int, to: Int, publish: Boolean = true) {
+    private fun move(events: List<List<TimeTravelEvent>>, listIndex: Int, from: Int, to: Int, publish: Boolean = true) {
         if (from == to) {
             return
         }
@@ -215,7 +238,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
             }
 
         for (i in progression) {
-            val event = events[i]
+            val event = events[listIndex][i]
             if ((event.type === StoreEventType.STATE) && stores.containsKey(event.storeName) && !set.contains(event.storeName)) {
                 set.add(event.storeName)
                 deque.addLast(event)

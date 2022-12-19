@@ -127,6 +127,21 @@ internal inline fun <T> DataWriter.writeCollection(collection: Collection<T>?, w
     }
 }
 
+internal inline fun <T> DataWriter.writeCollectionOfCollection(collection: Collection<Collection<T>>?, writeItem: DataWriter.(T) -> Unit) {
+    if (collection == null) {
+        writeInt(-1)
+    } else {
+        writeInt(collection.size)
+        collection.forEach {
+            writeInt(it.size)
+            it.forEach{
+                writeItem(it)
+            }
+        }
+    }
+}
+
+
 internal inline fun <K, V> DataWriter.writeMap(map: Map<K, V>?, writeKey: DataWriter.(K) -> Unit, writeValue: DataWriter.(V) -> Unit) {
     if (map == null) {
         writeInt(-1)

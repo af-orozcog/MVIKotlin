@@ -35,7 +35,7 @@ internal class TimeTravelClientStoreFactory(
         data class Connected(val writer: (TimeTravelCommand) -> Unit) : Msg()
         object Disconnected : Msg()
         data class StateUpdate(val stateUpdate: TimeTravelStateUpdate) : Msg()
-        data class EventSelected(val index: Int) : Msg()
+        data class EventSelected(val listIndex: Int, val eventIndex: Int) : Msg()
         data class EventValue(val eventId: Long, val value: ValueNode) : Msg()
         data class ErrorChanged(val text: String?) : Msg()
     }
@@ -53,7 +53,7 @@ internal class TimeTravelClientStoreFactory(
                 is Intent.MoveToEnd -> sendIfNeeded(getState()) { TimeTravelCommand.MoveToEnd }
                 is Intent.Cancel -> sendIfNeeded(getState()) { TimeTravelCommand.Cancel }
                 is Intent.DebugEvent -> debugEventIfNeeded(getState())
-                is Intent.SelectEvent -> selectEvent(intent.index, getState())
+                is Intent.SelectEvent -> selectEvent(intent.listIndex, intent.eventIndex, getState())
                 is Intent.ExportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ExportEvents }
                 is Intent.ImportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ImportEvents(intent.data) }
                 is Intent.DismissError -> dispatch(Msg.ErrorChanged(text = null))
@@ -108,21 +108,24 @@ internal class TimeTravelClientStoreFactory(
         private fun debugEventIfNeeded(state: State) {
             sendIfNeeded(state) {
                 events
-                    .getOrNull(selectedEventIndex)
-                    ?.id
+                    .getOrNull(selectedEventListIndex)
+                    ?.getOrNull(selectedEventIndex)?.id
                     ?.let(TimeTravelCommand::DebugEvent)
             }
         }
 
-        private fun selectEvent(index: Int, state: State) {
-            dispatch(Msg.EventSelected(index = index))
+        private fun selectEvent(listIndex: Int, eventIndex: Int, state: State) {
+            dispatch(Msg.EventSelected(listIndex = listIndex, eventIndex = eventIndex))
 
             sendIfNeeded(state) {
                 events
-                    .getOrNull(index)
+                    .getOrNull(listIndex)
+                    ?.getOrNull(eventIndex)
                     ?.takeIf { it.value == null }
                     ?.id
-                    ?.let(TimeTravelCommand::AnalyzeEvent)
+                    ?.let{
+                        (TimeTravelCommand::AnalyzeEvent)(listIndex,it)
+                    }
             }
         }
     }
@@ -157,16 +160,35 @@ internal class TimeTravelClientStoreFactory(
             copy(
                 events = events.applyUpdate(update = update.eventsUpdate),
                 currentEventIndex = update.selectedEventIndex,
+                selectedEventListIndex = update.selectedListEventIndex,
                 mode = update.mode,
                 selectedEventIndex = selectedEventIndex.coerceAtMost(events.lastIndex)
             )
 
-        private fun List<TimeTravelEvent>.applyUpdate(update: TimeTravelEventsUpdate): List<TimeTravelEvent> =
-            when (update) {
-                is TimeTravelEventsUpdate.All -> update.events.map { it.toDomain() }
-                is TimeTravelEventsUpdate.New -> this + update.events.map { it.toDomain() }
+        private fun addEvent(listIndex: Int, event: List<TimeTravelEvent>, events : List<List<TimeTravelEvent>>): List<List<TimeTravelEvent>> {
+            val helperFun = fun(index: Int, list: List<TimeTravelEvent>):List<TimeTravelEvent> {
+                var temp = list
+                if(index == listIndex){
+                    temp = temp + event
+                }
+                return temp
             }
+            return events.mapIndexed{ index: Int, list: List<TimeTravelEvent> -> helperFun(index,list)}
+        }
 
+        private fun List<List<TimeTravelEvent>>.applyUpdate(update: TimeTravelEventsUpdate): List<List<TimeTravelEvent>> {
+            when (update) {
+                is TimeTravelEventsUpdate.All -> return update.events.map { it1 -> it1.map { it.toDomain() } }
+                is TimeTravelEventsUpdate.NewList -> {
+                    var temp = this
+                    temp = listOf(*temp.toTypedArray(), update.events.map{it.toDomain()})
+                    return temp
+                }
+                is TimeTravelEventsUpdate.NewElement -> {
+                    return addEvent(update.listIndex,update.events.map { it.toDomain() },this)
+                }
+            }
+        }
         private fun TimeTravelEventProto.toDomain(): TimeTravelEvent =
             TimeTravelEvent(
                 id = id,
@@ -180,7 +202,7 @@ internal class TimeTravelClientStoreFactory(
             when (this) {
                 is Connection.Disconnected,
                 is Connection.Connecting -> this
-                is Connection.Connected -> copy(selectedEventIndex = msg.index)
+                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex)
             }
 
         private fun Connection.applyEventValue(msg: Msg.EventValue): Connection =
@@ -190,8 +212,8 @@ internal class TimeTravelClientStoreFactory(
 
                 is Connection.Connected ->
                     copy(
-                        events = events.map { event ->
-                            event.takeIf { it.id == msg.eventId }?.copy(value = msg.value) ?: event
+                        events = events.map { list ->
+                            list.map{ event -> event.takeIf { it.id == msg.eventId }?.copy(value = msg.value) ?: event}
                         }
                     )
             }
