@@ -88,6 +88,9 @@ interface TimeTravelController {
     @MainThread
     fun import(export: TimeTravelExport)
 
+    @MainThread
+    fun replicateEvents()
+
     /**
      * Fires a [TimeTravelEvent] allowing its debugging.
      * Please note that events of type [StoreEventType.STATE] can not be debugged.

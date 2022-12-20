@@ -107,6 +107,7 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(listIndex = command.listIndex, eventId = command.eventId, sender = sender)
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
+                is TimeTravelCommand.ReplicateEvents -> controller.replicateEvents()
             }.let {}
         }
     }

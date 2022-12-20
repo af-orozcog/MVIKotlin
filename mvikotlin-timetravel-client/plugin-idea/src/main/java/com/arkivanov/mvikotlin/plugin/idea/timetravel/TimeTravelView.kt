@@ -11,17 +11,19 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer
 import java.awt.BorderLayout
 import javax.swing.DefaultListModel
 import javax.swing.JComponent
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
 
-internal class TimeTravelView(
+class TimeTravelView(
     private val listener: Listener
 ) {
 
     private val toolbar = TimeTravelToolbar(listener)
+
     private val listModel = DefaultListModel<String>()
 
     private val list =
@@ -62,10 +64,12 @@ internal class TimeTravelView(
     }
 
     private fun renderEvents(events: List<List<String>>) {
+        val selectedIndex = list.selectedIndex
         listModel.clear()
-        if(events.isNotEmpty()){
-            events[0].forEach(listModel::addElement)
+        if(events.size != 0){
+            events[events.size-1].forEach(listModel::addElement)
         }
+        list.selectedIndex = selectedIndex
         list.updateUI()
     }
 

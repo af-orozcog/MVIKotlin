@@ -98,4 +98,8 @@ class TimeTravelClientComponent(
     override fun onDismissErrorClicked() {
         store.accept(Intent.DismissError)
     }
+
+    override fun onReplicateEventsClicked() {
+        store.accept(Intent.ReplicateEvents)
+    }
 }

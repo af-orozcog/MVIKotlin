@@ -31,7 +31,7 @@ private fun DataWriter.writeTimeTravelEventsUpdateAll(timeTravelEventsUpdate: Ti
 }
 
 private fun DataWriter.writeTimeTravelEventsUpdateNewList(timeTravelEventsUpdate: TimeTravelEventsUpdate.NewList) {
-    writeEnum(Type.NEWELEMENT)
+    writeEnum(Type.NEWLIST)
 
     writeCollection(timeTravelEventsUpdate.events) {
         writeTimeTravelEvent(it)

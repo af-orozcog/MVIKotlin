@@ -25,6 +25,7 @@ internal interface TimeTravelClientStore : Store<Intent, State, Label> {
         object ExportEvents : Intent()
         class ImportEvents(val data: ByteArray) : Intent()
         object DismissError : Intent()
+        object ReplicateEvents: Intent()
     }
 
     data class State(

@@ -35,9 +35,6 @@ internal class StateDiff {
         else if(new.size == previous.size && new[new.size-1].size > previous[new.size-1].size){
             return TimeTravelEventsUpdate.NewElement(new.size-1,new[new.size-1].subList(previous[new.size-1].size,new[new.size-1].size).toProto())
         }
-        else if(new.size == previous.size && new[new.size-1].size == previous[new.size-1].size){
-            return TimeTravelEventsUpdate.NewElement(new.size-1,emptyList())
-        }
         else {
             return TimeTravelEventsUpdate.All(new.toProto())
         }
