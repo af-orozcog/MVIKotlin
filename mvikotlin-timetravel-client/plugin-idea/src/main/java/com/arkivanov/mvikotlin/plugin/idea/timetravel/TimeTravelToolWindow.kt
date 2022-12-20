@@ -27,6 +27,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.prefs.Preferences
 import javax.swing.JComponent
+import com.intellij.openapi.diagnostic.Logger;
 
 class TimeTravelToolWindow(
     private val project: Project
@@ -199,6 +200,10 @@ class TimeTravelToolWindow(
 
         override fun onSettings() {
             settings.onEditClicked()
+        }
+
+        override fun onReplicateEvents() {
+            client.onReplicateEventsClicked()
         }
     }
 }

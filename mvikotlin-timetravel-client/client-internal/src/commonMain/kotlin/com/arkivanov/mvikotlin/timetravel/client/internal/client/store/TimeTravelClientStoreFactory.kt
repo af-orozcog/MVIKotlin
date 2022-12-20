@@ -51,6 +51,7 @@ internal class TimeTravelClientStoreFactory(
                 is Intent.StepBackward -> sendIfNeeded(getState()) { TimeTravelCommand.StepBackward }
                 is Intent.StepForward -> sendIfNeeded(getState()) { TimeTravelCommand.StepForward }
                 is Intent.MoveToEnd -> sendIfNeeded(getState()) { TimeTravelCommand.MoveToEnd }
+                is Intent.ReplicateEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ReplicateEvents }
                 is Intent.Cancel -> sendIfNeeded(getState()) { TimeTravelCommand.Cancel }
                 is Intent.DebugEvent -> debugEventIfNeeded(getState())
                 is Intent.SelectEvent -> selectEvent(intent.listIndex, intent.eventIndex, getState())

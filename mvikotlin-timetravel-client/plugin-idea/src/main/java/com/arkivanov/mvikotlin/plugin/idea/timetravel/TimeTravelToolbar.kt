@@ -29,7 +29,7 @@ class TimeTravelToolbar(private val listener: Listener) {
             isCancelEnabled = false,
             isDebugEventEnabled = false,
             isExportEventsEnabled = false,
-            isImportEventsEnabled = false
+            isImportEventsEnabled = false,
         )
 
     val component: JComponent get() = toolbar.component
@@ -178,5 +178,6 @@ class TimeTravelToolbar(private val listener: Listener) {
         fun onExport()
         fun onImport()
         fun onSettings()
+        fun onReplicateEvents()
     }
 }

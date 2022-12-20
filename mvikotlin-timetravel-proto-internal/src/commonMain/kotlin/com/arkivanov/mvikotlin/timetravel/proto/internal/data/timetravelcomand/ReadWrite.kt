@@ -20,6 +20,7 @@ internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelComm
         is TimeTravelCommand.StepForward -> writeEnum(Type.STEP_FORWARD)
         is TimeTravelCommand.MoveToEnd -> writeEnum(Type.MOVE_TO_END)
         is TimeTravelCommand.Cancel -> writeEnum(Type.CANCEL)
+        is TimeTravelCommand.ReplicateEvents -> writeEnum(Type.REPLICATE_EVENTS)
 
         is TimeTravelCommand.DebugEvent -> {
             writeEnum(Type.DEBUG_EVENT)
@@ -54,6 +55,7 @@ internal fun DataReader.readTimeTravelCommand(): TimeTravelCommand =
         Type.ANALYZE_EVENT -> TimeTravelCommand.AnalyzeEvent(listIndex = readInt(), eventId = readLong())
         Type.EXPORT_EVENTS -> TimeTravelCommand.ExportEvents
         Type.IMPORT_EVENTS -> TimeTravelCommand.ImportEvents(data = readByteArray()!!)
+        Type.REPLICATE_EVENTS -> TimeTravelCommand.ReplicateEvents
     }
 
 private enum class Type {
@@ -67,5 +69,6 @@ private enum class Type {
     DEBUG_EVENT,
     ANALYZE_EVENT,
     EXPORT_EVENTS,
-    IMPORT_EVENTS
+    IMPORT_EVENTS,
+    REPLICATE_EVENTS
 }

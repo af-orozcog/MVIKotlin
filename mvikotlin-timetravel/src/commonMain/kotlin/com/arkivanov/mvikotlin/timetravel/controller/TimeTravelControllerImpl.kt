@@ -108,7 +108,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         assertOnMainThread()
 
         if (state.mode === Mode.STOPPED) {
-            move(state.events, state.selectedListEventIndex, state.selectedEventIndex, state.events.lastIndex)
+            move(state.events, state.selectedListEventIndex, state.selectedEventIndex, state.events[state.selectedListEventIndex].lastIndex)
         }
     }
 
@@ -187,10 +187,19 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         return events.mapIndexed{ index: Int, list: List<TimeTravelEvent> -> helperFun(index,list)}
     }
 
+    override fun replicateEvents(){
+        when (state.mode) {
+            Mode.RECORDING -> {
+                swapState { it.copy(events = listOf(*it.events.toTypedArray(), it.events[it.events.size-1]), selectedListEventIndex = it.events.size) }
+            }
+            else -> {}
+        }
+    }
+
     private fun onEvent(listIndex: Int, event: TimeTravelEvent) {
         when (state.mode) {
             Mode.RECORDING -> {
-                swapState { it.copy(events = addEvent(listIndex, event, it.events), selectedEventIndex = it.events.size) }
+                swapState { it.copy(events = addEvent(listIndex, event, it.events), selectedEventIndex = it.events[it.selectedListEventIndex].size) }
                 process(event)
             }
 
@@ -208,7 +217,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
     private fun step(events: List<List<TimeTravelEvent>>, listIndex: Int, from: Int, isForward: Boolean) {
         val progression =
             if (isForward) {
-                (from + 1)..events.lastIndex
+                (from + 1)..events[listIndex].lastIndex
             } else {
                 (from - 1) downTo -1
             }

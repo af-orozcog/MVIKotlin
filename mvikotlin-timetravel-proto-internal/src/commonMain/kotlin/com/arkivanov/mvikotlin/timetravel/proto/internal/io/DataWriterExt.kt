@@ -116,7 +116,7 @@ internal fun DataWriter.writeBooleanArray(array: BooleanArray?) {
     }
 }
 
-internal inline fun <T> DataWriter.writeCollection(collection: Collection<T>?, writeItem: DataWriter.(T) -> Unit) {
+internal fun <T> DataWriter.writeCollection(collection: Collection<T>?, writeItem: DataWriter.(T) -> Unit) {
     if (collection == null) {
         writeInt(-1)
     } else {

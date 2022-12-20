@@ -18,8 +18,8 @@ internal fun List<TimeTravelEvent>.toProto(): List<TimeTravelEventProto>{
 @JvmName("myfunctionWithListList")
 internal fun List<List<TimeTravelEvent>>.toProto(): List<List<TimeTravelEventProto>> {
     val valueParser = ValueParser()
-
-    return map { list -> list.map{it.toProto(valueParser)}}
+    val answer = map { list -> list.map{it.toProto(valueParser)}}
+    return answer
 }
 
 private fun TimeTravelEvent.toProto(valueParser: ValueParser): TimeTravelEventProto =

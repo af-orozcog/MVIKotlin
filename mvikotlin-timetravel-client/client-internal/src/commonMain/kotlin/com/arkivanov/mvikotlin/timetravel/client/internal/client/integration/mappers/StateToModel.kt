@@ -53,7 +53,7 @@ private fun State.Connection.toButtons(): Model.Buttons =
         isCancelEnabled = isModeRecording() || isModeStopped(),
         isDebugEventEnabled = isDebuggableEventSelected(),
         isExportEventsEnabled = isModeStopped(),
-        isImportEventsEnabled = isModeIdle()
+        isImportEventsEnabled = isModeIdle(),
     )
 
 private fun State.Connection.isModeIdle(): Boolean =

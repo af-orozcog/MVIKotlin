@@ -76,15 +76,12 @@ internal inline fun <T> DataReader.readList(readItem: DataReader.() -> T): List<
     }
 
 internal inline fun <T : Any> DataReader.readListOfList(readItem: DataReader.() -> T) : List<List<T>>? {
-    var ans = listOf<List<T>>(emptyList())
-    readSized {
-        for(i in 1..it){
+    var ans:List<List<T>> = emptyList()
+    readSized { it1 ->
+        for(i in 1..it1){
             var listToAdd:List<T> = emptyList()
-            readSized {
-                for(j in 1..it){
-                    var toAdd = readItem()
-                    listToAdd = listToAdd + toAdd
-                }
+            readSized { it2 ->
+                listToAdd = List(it2) {readItem()}
             }
             ans = listOf(*ans.toTypedArray(), listToAdd)
         }
