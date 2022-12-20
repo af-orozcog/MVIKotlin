@@ -14,6 +14,9 @@ plugins {
 setupMultiplatform()
 setupPublication()
 setupBinaryCompatibilityValidator()
+dependencies {
+    implementation(project(mapOf("path" to ":mvikotlin-timetravel-proto-internal")))
+}
 
 kotlin {
     setupSourceSets {
@@ -24,6 +27,7 @@ kotlin {
 
         common.main.dependencies {
             implementation(project(":mvikotlin"))
+            implementation(project(":mvikotlin-timetravel-proto-internal"))
             implementation(project(":rx"))
             implementation(project(":rx-internal"))
         }

@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.Executor
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 
 /**
  * An implementation of the [StoreFactory] that creates default implementations of the [Store].
@@ -17,13 +18,15 @@ class DefaultStoreFactory : StoreFactory {
         initialState: State,
         bootstrapper: Bootstrapper<Action>?,
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
-        reducer: Reducer<State, Message>
+        reducer: Reducer<State, Message>,
+        exposedFunctions:List<TimeTravelFunction>
     ): Store<Intent, State, Label> =
         DefaultStore(
             initialState = initialState,
             bootstrapper = bootstrapper,
             executor = executorFactory(),
-            reducer = reducer
+            reducer = reducer,
+            exposedFunctions = exposedFunctions
         ).apply {
             if (autoInit) {
                 init()

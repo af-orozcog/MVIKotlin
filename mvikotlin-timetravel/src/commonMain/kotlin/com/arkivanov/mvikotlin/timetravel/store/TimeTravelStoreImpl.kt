@@ -2,6 +2,7 @@ package com.arkivanov.mvikotlin.timetravel.store
 
 import com.arkivanov.mvikotlin.core.store.Bootstrapper
 import com.arkivanov.mvikotlin.core.store.Executor
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.StoreEventType
 import com.arkivanov.mvikotlin.core.utils.assertOnMainThread
@@ -28,6 +29,7 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
     private val stateSubject = BehaviorSubject(initialState)
     override val state: State get() = stateSubject.value
     override val isDisposed: Boolean get() = !stateSubject.isActive
+    override val exposedFunctions: List<TimeTravelFunction> get() = emptyList()
     private val labelSubject = PublishSubject<Label>()
     private val eventSubjects = StoreEventType.values().associateWith { PublishSubject<Event>() }
     private var debuggingExecutor by atomic<Executor<*, *, *, *, *>?>(null)
@@ -218,4 +220,5 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
             labelSubject.onNext(label)
         }
     }
+
 }

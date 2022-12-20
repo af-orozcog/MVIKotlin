@@ -29,6 +29,7 @@ internal class ListStoreFactory(
             bootstrapper = SimpleBootstrapper(Unit),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
+            exposedFunctions = emptyList()
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.

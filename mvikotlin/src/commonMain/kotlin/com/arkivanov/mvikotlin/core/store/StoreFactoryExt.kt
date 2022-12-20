@@ -3,6 +3,7 @@ package com.arkivanov.mvikotlin.core.store
 import com.arkivanov.mvikotlin.utils.internal.atomic
 import com.arkivanov.mvikotlin.utils.internal.initialize
 import com.arkivanov.mvikotlin.utils.internal.requireValue
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 
 /**
  * A convenience extension function that creates an implementation of [Store]
@@ -14,14 +15,16 @@ fun <Intent : Any, State : Any> StoreFactory.create(
     name: String? = null,
     autoInit: Boolean = true,
     initialState: State,
-    reducer: Reducer<State, Intent>
+    reducer: Reducer<State, Intent>,
+    exposedFunctions:List<TimeTravelFunction>
 ): Store<Intent, State, Nothing> =
     create(
         name = name,
         autoInit = autoInit,
         initialState = initialState,
         executorFactory = ::BypassExecutor,
-        reducer = reducer
+        reducer = reducer,
+        exposedFunctions = exposedFunctions
     )
 
 private class BypassExecutor<Intent : Any, in State : Any> : Executor<Intent, Nothing, State, Intent, Nothing> {

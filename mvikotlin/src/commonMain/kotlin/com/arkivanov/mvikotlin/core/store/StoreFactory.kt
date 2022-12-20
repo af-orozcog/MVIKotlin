@@ -1,5 +1,6 @@
 package com.arkivanov.mvikotlin.core.store
 
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import kotlin.js.JsName
 
 /**
@@ -25,7 +26,8 @@ interface StoreFactory {
         bootstrapper: Bootstrapper<Action>? = null,
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
         @Suppress("UNCHECKED_CAST")
-        reducer: Reducer<State, Message> = bypassReducer as Reducer<State, Any>
+        reducer: Reducer<State, Message> = bypassReducer as Reducer<State, Any>,
+        exposedFunctions:List<TimeTravelFunction>
     ): Store<Intent, State, Label>
 
     private companion object {

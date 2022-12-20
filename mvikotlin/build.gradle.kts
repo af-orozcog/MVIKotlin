@@ -29,6 +29,7 @@ kotlin {
         nativeSet dependsOn jsNative
 
         common.main.dependencies {
+            implementation(project(":mvikotlin-timetravel-proto-internal"))
             implementation(project(":utils-internal"))
             implementation(project(":rx"))
             implementation(project(":rx-internal"))

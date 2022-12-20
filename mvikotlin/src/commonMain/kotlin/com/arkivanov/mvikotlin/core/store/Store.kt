@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.annotations.MainThread
 import com.arkivanov.mvikotlin.rx.Disposable
 import com.arkivanov.mvikotlin.rx.Observer
 import kotlin.js.JsName
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 
 /**
  * `Store` is a place for business logic, it consumes `Intents` and produces `States`.
@@ -103,6 +104,8 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
      */
     val isDisposed: Boolean
 
+    val exposedFunctions:List<TimeTravelFunction>
+
     /**
      * Subscribes the provided [Observer] of `States`.
      * Can be called on any thread.
@@ -149,4 +152,5 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
      */
     @MainThread
     fun dispose()
+
 }

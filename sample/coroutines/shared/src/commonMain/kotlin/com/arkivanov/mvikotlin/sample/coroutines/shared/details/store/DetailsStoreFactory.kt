@@ -65,6 +65,7 @@ internal class DetailsStoreFactory(
                     is Msg.DoneToggled -> copy(data = data?.copy(isDone = !data.isDone))
                 }
             },
+            exposedFunctions = emptyList()
         ) {}
 
 

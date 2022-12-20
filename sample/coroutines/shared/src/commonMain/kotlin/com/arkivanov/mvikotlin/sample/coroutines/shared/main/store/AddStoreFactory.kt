@@ -27,6 +27,7 @@ internal class AddStoreFactory(
             initialState = State(),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
+            exposedFunctions = emptyList()
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.
