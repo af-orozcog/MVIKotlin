@@ -109,6 +109,7 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
                 is TimeTravelCommand.ReplicateEvents -> Unit
+                is TimeTravelCommand.ApplyFunction -> Unit
             }.let {}
         }
     }

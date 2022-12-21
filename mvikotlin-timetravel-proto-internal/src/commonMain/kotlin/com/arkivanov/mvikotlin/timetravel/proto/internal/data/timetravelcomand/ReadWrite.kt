@@ -1,15 +1,21 @@
 package com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand
 
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelparametersignature.writeTimeTravelParameterSignature
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.DataReader
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.DataWriter
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readByteArray
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readEnum
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readInt
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readLong
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.readString
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeByteArray
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeCollection
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeEnum
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeInt
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeLong
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.writeString
 
 internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelCommand) {
     when (timeTravelCommand) {
@@ -39,8 +45,45 @@ internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelComm
             writeEnum(Type.IMPORT_EVENTS)
             writeByteArray(timeTravelCommand.data)
         }
+
+        is TimeTravelCommand.ApplyFunction -> {
+            writeEnum(Type.APPLY_FUNCTION)
+            writeInt(timeTravelCommand.listIndex)
+            writeLong(timeTravelCommand.eventId)
+            writeString(timeTravelCommand.functionName)
+            writeCollection(timeTravelCommand.arguments) {
+                writePairStringAny(it)
+            }
+        }
+
     }.let {}
 }
+
+internal fun DataWriter.writePairStringAny(pair: Pair<String,Any>) {
+    writeString(pair.first)
+    when (pair.first){
+        "String" -> writeString(pair.second as String)
+        "Int" -> writeInt(pair.second as Int)
+        "Long" -> writeLong(pair.second as Long)
+    }
+}
+
+internal fun DataReader.readPairStringAny():Pair<String,Any> {
+    val type:String = readString()!!
+    var value:Any = -1
+    when (type){
+        "String" -> value = readString()!!
+        "Int" -> value = readInt()
+        "Long" -> value = readLong()
+    }
+    return Pair(type,value)
+}
+
+internal fun DataReader.readListPairStringAny():List<Pair<String,Any>>{
+    val use = readList { readPairStringAny() }
+    return use as List<Pair<String,Any>>
+}
+
 
 internal fun DataReader.readTimeTravelCommand(): TimeTravelCommand =
     when (readEnum<Type>()) {
@@ -56,6 +99,7 @@ internal fun DataReader.readTimeTravelCommand(): TimeTravelCommand =
         Type.EXPORT_EVENTS -> TimeTravelCommand.ExportEvents
         Type.IMPORT_EVENTS -> TimeTravelCommand.ImportEvents(data = readByteArray()!!)
         Type.REPLICATE_EVENTS -> TimeTravelCommand.ReplicateEvents
+        Type.APPLY_FUNCTION -> TimeTravelCommand.ApplyFunction(listIndex = readInt(), eventId = readLong(), functionName = readString()!!, arguments = readListPairStringAny())
     }
 
 private enum class Type {
@@ -70,5 +114,6 @@ private enum class Type {
     ANALYZE_EVENT,
     EXPORT_EVENTS,
     IMPORT_EVENTS,
-    REPLICATE_EVENTS
+    REPLICATE_EVENTS,
+    APPLY_FUNCTION
 }
