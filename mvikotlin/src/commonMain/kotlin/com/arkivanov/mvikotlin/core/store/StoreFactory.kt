@@ -27,7 +27,8 @@ interface StoreFactory {
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
         @Suppress("UNCHECKED_CAST")
         reducer: Reducer<State, Message> = bypassReducer as Reducer<State, Any>,
-        exposedFunctions:TimeTravelFunctionList
+        exposedFunctionsSignature:TimeTravelFunctionList,
+        exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
     ): Store<Intent, State, Label>
 
     private companion object {

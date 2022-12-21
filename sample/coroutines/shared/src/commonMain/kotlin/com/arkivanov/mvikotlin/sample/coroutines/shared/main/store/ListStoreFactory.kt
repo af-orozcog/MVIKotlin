@@ -23,9 +23,6 @@ internal class ListStoreFactory(
     private val mainContext: CoroutineContext,
     private val ioContext: CoroutineContext,
 ) {
-
-    val toUse = TimeTravelFunctionList(listOf(TimeTravelFunction("Pepeto","String",emptyList())))
-
     fun create(): ListStore =
         object : ListStore, Store<Intent, State, Nothing> by storeFactory.create(
             name = "ListStore",
@@ -33,7 +30,8 @@ internal class ListStoreFactory(
             bootstrapper = SimpleBootstrapper(Unit),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
-            exposedFunctions = toUse
+            exposedFunctionsSignature = TimeTravelFunctionList(listOf(TimeTravelFunction("Pepeto","String", emptyList()))),
+            exposedFunctions = emptyMap()
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.

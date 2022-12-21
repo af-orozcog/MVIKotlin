@@ -36,7 +36,8 @@ class LoggingStoreFactory(
         bootstrapper: Bootstrapper<Action>?,
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
         reducer: Reducer<State, Message>,
-        exposedFunctions:TimeTravelFunctionList
+        exposedFunctionsSignature:TimeTravelFunctionList,
+        exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
     ): Store<Intent, State, Label> {
         if (name == null) {
             return delegate.create(
@@ -45,6 +46,7 @@ class LoggingStoreFactory(
                 bootstrapper = bootstrapper,
                 executorFactory = executorFactory,
                 reducer = reducer,
+                exposedFunctionsSignature = exposedFunctionsSignature,
                 exposedFunctions = exposedFunctions
             )
         }
@@ -69,6 +71,7 @@ class LoggingStoreFactory(
                     logger = loggerWrapper,
                     storeName = name
                 ),
+                exposedFunctionsSignature = exposedFunctionsSignature,
                 exposedFunctions = exposedFunctions
             )
 

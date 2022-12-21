@@ -19,13 +19,15 @@ class DefaultStoreFactory : StoreFactory {
         bootstrapper: Bootstrapper<Action>?,
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
         reducer: Reducer<State, Message>,
-        exposedFunctions:TimeTravelFunctionList
+        exposedFunctionsSignature:TimeTravelFunctionList,
+        exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
     ): Store<Intent, State, Label> =
         DefaultStore(
             initialState = initialState,
             bootstrapper = bootstrapper,
             executor = executorFactory(),
             reducer = reducer,
+            exposedFunctionsSignature = exposedFunctionsSignature,
             exposedFunctions = exposedFunctions
         ).apply {
             if (autoInit) {

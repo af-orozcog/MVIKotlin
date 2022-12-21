@@ -67,7 +67,8 @@ internal class DetailsStoreFactory(
                     is Msg.DoneToggled -> copy(data = data?.copy(isDone = !data.isDone))
                 }
             },
-            exposedFunctions = TimeTravelFunctionList(listOf(TimeTravelFunction("Pepeto","String",emptyList())))
+            exposedFunctions = emptyMap(),
+            exposedFunctionsSignature = TimeTravelFunctionList(emptyList())
         ) {}
 
 

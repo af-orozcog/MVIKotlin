@@ -28,7 +28,8 @@ internal class AddStoreFactory(
             initialState = State(),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
-            exposedFunctions = TimeTravelFunctionList(emptyList())
+            exposedFunctionsSignature = TimeTravelFunctionList(emptyList()),
+            exposedFunctions = emptyMap()
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.

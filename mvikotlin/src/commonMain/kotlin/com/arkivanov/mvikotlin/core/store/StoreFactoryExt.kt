@@ -17,7 +17,8 @@ fun <Intent : Any, State : Any> StoreFactory.create(
     autoInit: Boolean = true,
     initialState: State,
     reducer: Reducer<State, Intent>,
-    exposedFunctions:TimeTravelFunctionList
+    exposedFunctionsSignature:TimeTravelFunctionList,
+    exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
 ): Store<Intent, State, Nothing> =
     create(
         name = name,
@@ -25,6 +26,7 @@ fun <Intent : Any, State : Any> StoreFactory.create(
         initialState = initialState,
         executorFactory = ::BypassExecutor,
         reducer = reducer,
+        exposedFunctionsSignature = exposedFunctionsSignature,
         exposedFunctions = exposedFunctions
     )
 

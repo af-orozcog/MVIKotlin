@@ -104,7 +104,15 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
      */
     val isDisposed: Boolean
 
-    val exposedFunctions:TimeTravelFunctionList
+    /**
+     * Returns the functions and the signatures
+     */
+    val exposedFunctionsSignature:TimeTravelFunctionList
+
+    /**
+     * the actual functions that a user can call
+     */
+    val exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
 
     /**
      * Subscribes the provided [Observer] of `States`.
