@@ -3,6 +3,7 @@ package com.arkivanov.mvikotlin.plugin.idea.timetravel
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.timetravel.client.internal.client.TimeTravelClient.Model
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueNode
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBList
@@ -33,17 +34,25 @@ class TimeTravelView(
             }
         }
 
+    private val functionsModel = DefaultListModel<String>()
+    private val functionsList = JBList(functionsModel)
+
     private val treeModel = DefaultTreeModel(null)
     private val tree = JTree(treeModel)
+
+    private val centerPart = JBSplitter(false, SPLITTER_PROPORTION).apply {
+        firstComponent = JBScrollPane(list)
+        secondComponent = JBScrollPane(tree)
+    }
 
     val content: JComponent =
         JPanel(BorderLayout()).apply {
             add(toolbar.component, BorderLayout.NORTH)
 
             add(
-                JBSplitter(false, SPLITTER_PROPORTION).apply {
-                    firstComponent = JBScrollPane(list)
-                    secondComponent = JBScrollPane(tree)
+                JBSplitter(true, SPLITTER_PROPORTION).apply {
+                    firstComponent = centerPart
+                    secondComponent = JBScrollPane(functionsList)
                 },
                 BorderLayout.CENTER
             )
@@ -57,6 +66,7 @@ class TimeTravelView(
             diff(get = Model::selectedEventIndex, set = ::renderSelectedEventIndex)
             diff(get = Model::selectedEventValue, set = ::renderSelectedEventValue)
             diff(get = Model::errorText, set = ::renderError)
+            diff(get = Model::exposedFunctions, set = ::renderExposedFunctions)
         }
 
     fun render(model: Model) {
@@ -71,6 +81,17 @@ class TimeTravelView(
         }
         list.selectedIndex = selectedIndex
         list.updateUI()
+    }
+
+    private fun renderExposedFunctions(functions: List<TimeTravelFunction>) {
+        val selectedIndex = functionsList.selectedIndex
+        functionsModel.clear()
+        functions.forEach{
+            function -> functionsModel.addElement(function.name)
+        }
+
+        functionsList.selectedIndex = selectedIndex
+        functionsList.updateUI()
     }
 
     private fun renderCurrentEventIndex(selectedEventIndex: Int) {

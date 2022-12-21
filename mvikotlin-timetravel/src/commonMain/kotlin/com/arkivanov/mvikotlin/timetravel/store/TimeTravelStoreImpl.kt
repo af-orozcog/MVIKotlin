@@ -22,6 +22,7 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
     private val executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
     private val reducer: Reducer<State, Message>,
     private val onInit: (TimeTravelStore<Intent, State, Label>) -> Unit = {},
+    override val exposedFunctions: TimeTravelFunctionList
 ) : TimeTravelStore<Intent, State, Label> {
 
     private val executor = executorFactory()
@@ -29,7 +30,6 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
     private val stateSubject = BehaviorSubject(initialState)
     override val state: State get() = stateSubject.value
     override val isDisposed: Boolean get() = !stateSubject.isActive
-    override val exposedFunctions: TimeTravelFunctionList get() = TimeTravelFunctionList(emptyList())
     private val labelSubject = PublishSubject<Label>()
     private val eventSubjects = StoreEventType.values().associateWith { PublishSubject<Event>() }
     private var debuggingExecutor by atomic<Executor<*, *, *, *, *>?>(null)

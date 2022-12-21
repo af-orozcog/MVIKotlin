@@ -11,6 +11,7 @@ import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.ListStore.Sta
 import com.arkivanov.mvikotlin.sample.database.TodoDatabase
 import com.arkivanov.mvikotlin.sample.database.TodoItem
 import com.arkivanov.mvikotlin.sample.database.update
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
@@ -23,6 +24,8 @@ internal class ListStoreFactory(
     private val ioContext: CoroutineContext,
 ) {
 
+    val toUse = TimeTravelFunctionList(listOf(TimeTravelFunction("Pepeto","String",emptyList())))
+
     fun create(): ListStore =
         object : ListStore, Store<Intent, State, Nothing> by storeFactory.create(
             name = "ListStore",
@@ -30,7 +33,7 @@ internal class ListStoreFactory(
             bootstrapper = SimpleBootstrapper(Unit),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
-            exposedFunctions = TimeTravelFunctionList(emptyList())
+            exposedFunctions = toUse
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.

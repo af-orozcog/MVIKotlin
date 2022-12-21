@@ -1,5 +1,6 @@
 package com.arkivanov.mvikotlin.timetravel.server
 
+import com.arkivanov.mvikotlin.core.store.StoreEventType
 import com.arkivanov.mvikotlin.rx.Disposable
 import com.arkivanov.mvikotlin.rx.observer
 import com.arkivanov.mvikotlin.timetravel.controller.TimeTravelController
@@ -116,7 +117,9 @@ internal class TimeTravelServerImpl(
         val event = controller.state.events.getOrNull(listIndex)?.firstOrNull { it.id == eventId } ?: return
         val parsedValue = ValueParser().parseValue(event.value)
         sendData(sender, TimeTravelEventValue(eventId = eventId, value = parsedValue))
-        sendData(sender,controller.getStore(event.storeName).exposedFunctions!!)
+        if(event.type == StoreEventType.INTENT){
+            sendData(sender,controller.getStore(event.storeName).exposedFunctions)
+        }
     }
 
     private fun exportEvents(sender: Socket) {

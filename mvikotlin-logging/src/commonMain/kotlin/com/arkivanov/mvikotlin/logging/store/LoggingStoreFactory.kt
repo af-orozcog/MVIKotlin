@@ -69,7 +69,7 @@ class LoggingStoreFactory(
                     logger = loggerWrapper,
                     storeName = name
                 ),
-                exposedFunctions = TimeTravelFunctionList(emptyList())
+                exposedFunctions = exposedFunctions
             )
 
         return LoggingStore(
