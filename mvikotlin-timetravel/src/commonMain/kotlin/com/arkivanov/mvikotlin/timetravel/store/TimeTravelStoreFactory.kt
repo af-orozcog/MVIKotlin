@@ -2,7 +2,7 @@ package com.arkivanov.mvikotlin.timetravel.store
 
 import com.arkivanov.mvikotlin.core.store.Bootstrapper
 import com.arkivanov.mvikotlin.core.store.Executor
-import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -20,7 +20,7 @@ class TimeTravelStoreFactory : StoreFactory {
         bootstrapper: Bootstrapper<Action>?,
         executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
         reducer: Reducer<State, Message>,
-        exposedFunctions:List<TimeTravelFunction>
+        exposedFunctions:TimeTravelFunctionList
     ): Store<Intent, State, Label> =
         TimeTravelStoreImpl(
             initialState = initialState,

@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.rx.Observer
 import com.arkivanov.mvikotlin.timetravel.TimeTravelEvent
 import com.arkivanov.mvikotlin.timetravel.TimeTravelState
 import com.arkivanov.mvikotlin.timetravel.export.TimeTravelExport
+import com.arkivanov.mvikotlin.timetravel.store.TimeTravelStore
 
 /**
  * Provides methods to control time travel feature.
@@ -89,7 +90,7 @@ interface TimeTravelController {
     fun import(export: TimeTravelExport)
 
     @MainThread
-    fun replicateEvents()
+    fun getStore(name:String): TimeTravelStore<*, *, *>
 
     /**
      * Fires a [TimeTravelEvent] allowing its debugging.

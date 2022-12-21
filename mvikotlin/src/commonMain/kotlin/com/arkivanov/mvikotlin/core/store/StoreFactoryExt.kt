@@ -1,9 +1,10 @@
 package com.arkivanov.mvikotlin.core.store
 
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import com.arkivanov.mvikotlin.utils.internal.atomic
 import com.arkivanov.mvikotlin.utils.internal.initialize
 import com.arkivanov.mvikotlin.utils.internal.requireValue
-import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 
 /**
  * A convenience extension function that creates an implementation of [Store]
@@ -16,7 +17,7 @@ fun <Intent : Any, State : Any> StoreFactory.create(
     autoInit: Boolean = true,
     initialState: State,
     reducer: Reducer<State, Intent>,
-    exposedFunctions:List<TimeTravelFunction>
+    exposedFunctions:TimeTravelFunctionList
 ): Store<Intent, State, Nothing> =
     create(
         name = name,

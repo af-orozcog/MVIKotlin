@@ -14,6 +14,7 @@ import com.arkivanov.mvikotlin.sample.database.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 
 internal class ListStoreFactory(
     private val storeFactory: StoreFactory,
@@ -29,7 +30,7 @@ internal class ListStoreFactory(
             bootstrapper = SimpleBootstrapper(Unit),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
-            exposedFunctions = emptyList()
+            exposedFunctions = TimeTravelFunctionList(emptyList())
         ) {}
 
     // Serializable only for exporting events in Time Travel, no need otherwise.

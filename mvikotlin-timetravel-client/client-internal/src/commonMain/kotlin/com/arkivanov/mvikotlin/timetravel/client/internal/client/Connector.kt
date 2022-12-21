@@ -1,6 +1,8 @@
 package com.arkivanov.mvikotlin.timetravel.client.internal.client
 
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.TimeTravelCommand
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.TimeTravelStateUpdate
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueNode
 import com.badoo.reaktive.annotations.EventsOnMainScheduler
@@ -17,5 +19,6 @@ interface Connector {
         class EventValue(val eventId: Long, val value: ValueNode) : Event()
         class ExportEvents(val data: ByteArray) : Event()
         class Error(val text: String?) : Event()
+        class ExposedFunctions(val functions: List<TimeTravelFunction>): Event()
     }
 }

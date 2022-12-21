@@ -7,12 +7,15 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.T
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.writeTimeTravelCommand
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelexport.TimeTravelExport
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelexport.writeTimeTravelExport
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.writeTimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.TimeTravelStateUpdate
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.writeTimeTravelStateUpdate
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ProtoObjectType.TIME_TRAVEL_COMMAND
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ProtoObjectType.TIME_TRAVEL_EVENT_VALUE
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ProtoObjectType.TIME_TRAVEL_EXPORT
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ProtoObjectType.TIME_TRAVEL_STATE_UPDATE
+import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ProtoObjectType.TIME_TRAVEL_FUNCTION_LIST
 
 class ProtoEncoder(
     private val consume: (data: ByteArray, size: Int) -> Unit
@@ -32,6 +35,7 @@ class ProtoEncoder(
             is TimeTravelCommand -> writeTyped(TIME_TRAVEL_COMMAND) { writeTimeTravelCommand(obj) }
             is TimeTravelEventValue -> writeTyped(TIME_TRAVEL_EVENT_VALUE) { writeTimeTravelEventValue(obj) }
             is TimeTravelExport -> writeTyped(TIME_TRAVEL_EXPORT) { writeTimeTravelExport(obj) }
+            is TimeTravelFunctionList -> writeTyped(TIME_TRAVEL_FUNCTION_LIST) { writeTimeTravelFunctionList(obj) }
             else -> throw IllegalArgumentException("Unsupported proto object type: $this")
         }
     }

@@ -46,6 +46,11 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         bypassStore(store)
     }
 
+    @MainThread
+    override fun getStore(name:String):TimeTravelStore<*, *, *>{
+        return stores[name]!!
+    }
+
     private fun addStore(store: TimeTravelStore<*, *, *>, name: String) {
         stores[name] = store
         store.events(
@@ -185,15 +190,6 @@ internal class TimeTravelControllerImpl : TimeTravelController {
             return temp
         }
         return events.mapIndexed{ index: Int, list: List<TimeTravelEvent> -> helperFun(index,list)}
-    }
-
-    override fun replicateEvents(){
-        when (state.mode) {
-            Mode.RECORDING -> {
-                swapState { it.copy(events = listOf(*it.events.toTypedArray(), it.events[it.events.size-1]), selectedListEventIndex = it.events.size) }
-            }
-            else -> {}
-        }
     }
 
     private fun onEvent(listIndex: Int, event: TimeTravelEvent) {

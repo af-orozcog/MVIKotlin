@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.timetravel.client.internal.closeSafeAsync
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.ProtoObject
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetraveleventvalue.TimeTravelEventValue
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelexport.TimeTravelExport
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.TimeTravelStateUpdate
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ReaderThread
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.WriterThread
@@ -66,6 +67,7 @@ class DefaultConnector(
                         when (it) {
                             is TimeTravelStateUpdate -> Event.StateUpdate(it)
                             is TimeTravelEventValue -> Event.EventValue(eventId = it.eventId, value = it.value)
+                            is TimeTravelFunctionList -> Event.ExposedFunctions(functions = it.functions)
                             is TimeTravelExport -> Event.ExportEvents(it.data)
                             else -> Event.Error(text = "Unsupported proto object type: $it")
                         }

@@ -12,6 +12,7 @@ import com.arkivanov.mvikotlin.sample.coroutines.shared.details.store.DetailsSto
 import com.arkivanov.mvikotlin.sample.coroutines.shared.details.store.DetailsStore.State
 import com.arkivanov.mvikotlin.sample.database.TodoDatabase
 import com.arkivanov.mvikotlin.sample.database.TodoItem
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
@@ -65,7 +66,7 @@ internal class DetailsStoreFactory(
                     is Msg.DoneToggled -> copy(data = data?.copy(isDone = !data.isDone))
                 }
             },
-            exposedFunctions = emptyList()
+            exposedFunctions = TimeTravelFunctionList(emptyList())
         ) {}
 
 
