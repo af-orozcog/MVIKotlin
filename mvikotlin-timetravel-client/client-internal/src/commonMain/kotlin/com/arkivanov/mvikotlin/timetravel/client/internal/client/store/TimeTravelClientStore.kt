@@ -24,6 +24,7 @@ internal interface TimeTravelClientStore : Store<Intent, State, Label> {
         object Cancel : Intent()
         object DebugEvent : Intent()
         data class SelectEvent(val listIndex: Int, val eventIndex: Int) : Intent()
+        data class ApplyFunction(val listIndex: Int, val eventIndex: Int, val functionName: String, val arguments: List<Pair<String, Any>>) : Intent()
         object ExportEvents : Intent()
         class ImportEvents(val data: ByteArray) : Intent()
         object DismissError : Intent()

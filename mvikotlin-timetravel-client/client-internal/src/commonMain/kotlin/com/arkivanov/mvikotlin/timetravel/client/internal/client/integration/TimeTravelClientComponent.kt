@@ -102,4 +102,8 @@ class TimeTravelClientComponent(
     override fun onReplicateEventsClicked() {
         store.accept(Intent.ReplicateEvents)
     }
+
+    override fun onSelectedMethod(functionName: String, arguments: List<Pair<String, Any>>) {
+        store.accept(Intent.ApplyFunction(listIndex = models.value.selectedEventListIndex, eventIndex = models.value.currentEventIndex, functionName = functionName, arguments = arguments))
+    }
 }

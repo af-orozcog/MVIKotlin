@@ -63,6 +63,7 @@ internal class TimeTravelClientStoreFactory(
                 is Intent.ExportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ExportEvents }
                 is Intent.ImportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ImportEvents(intent.data) }
                 is Intent.DismissError -> dispatch(Msg.ErrorChanged(text = null))
+                is Intent.ApplyFunction -> applyFunction(listIndex = intent.listIndex, eventIndex = intent.eventIndex, functionName = intent.functionName, arguments = intent.arguments, state = getState())
             }
 
         private fun connectIfNeeded(state: State): Unit =
@@ -135,6 +136,20 @@ internal class TimeTravelClientStoreFactory(
                     }
             }
         }
+
+        private fun applyFunction(listIndex: Int, eventIndex: Int, functionName: String, arguments: List<Pair<String, Any>>, state: State) {
+            sendIfNeeded(state) {
+                events
+                    .getOrNull(listIndex)
+                    ?.getOrNull(eventIndex)
+                    ?.takeIf { it.value == null }
+                    ?.id
+                    ?.let{
+                        (TimeTravelCommand::ApplyFunction)(it,functionName,arguments)
+                    }
+            }
+        }
+
     }
 
     private object ReducerImpl : Reducer<State, Msg> {

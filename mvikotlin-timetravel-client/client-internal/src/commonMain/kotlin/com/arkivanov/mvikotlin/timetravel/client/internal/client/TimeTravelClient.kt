@@ -23,6 +23,7 @@ interface TimeTravelClient {
     fun onImportEventsClicked()
     fun onDismissErrorClicked()
     fun onReplicateEventsClicked()
+    fun onSelectedMethod(functionName:String, arguments:List<Pair<String,Any>>)
 
     data class Model(
         val events: List<List<String>>,
