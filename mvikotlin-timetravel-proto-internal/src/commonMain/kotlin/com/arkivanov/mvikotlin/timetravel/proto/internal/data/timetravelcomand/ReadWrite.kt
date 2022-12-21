@@ -48,7 +48,6 @@ internal fun DataWriter.writeTimeTravelCommand(timeTravelCommand: TimeTravelComm
 
         is TimeTravelCommand.ApplyFunction -> {
             writeEnum(Type.APPLY_FUNCTION)
-            writeInt(timeTravelCommand.listIndex)
             writeLong(timeTravelCommand.eventId)
             writeString(timeTravelCommand.functionName)
             writeCollection(timeTravelCommand.arguments) {
@@ -99,7 +98,7 @@ internal fun DataReader.readTimeTravelCommand(): TimeTravelCommand =
         Type.EXPORT_EVENTS -> TimeTravelCommand.ExportEvents
         Type.IMPORT_EVENTS -> TimeTravelCommand.ImportEvents(data = readByteArray()!!)
         Type.REPLICATE_EVENTS -> TimeTravelCommand.ReplicateEvents
-        Type.APPLY_FUNCTION -> TimeTravelCommand.ApplyFunction(listIndex = readInt(), eventId = readLong(), functionName = readString()!!, arguments = readListPairStringAny())
+        Type.APPLY_FUNCTION -> TimeTravelCommand.ApplyFunction(eventId = readLong(), functionName = readString()!!, arguments = readListPairStringAny())
     }
 
 private enum class Type {

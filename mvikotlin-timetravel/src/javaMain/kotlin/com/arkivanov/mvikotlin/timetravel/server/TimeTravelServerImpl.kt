@@ -109,7 +109,7 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
                 is TimeTravelCommand.ReplicateEvents -> Unit
-                is TimeTravelCommand.ApplyFunction -> Unit
+                is TimeTravelCommand.ApplyFunction -> controller.applyFunction(eventId = command.eventId, functionName = command.functionName, arguments = command.arguments)
             }.let {}
         }
     }
@@ -119,7 +119,7 @@ internal class TimeTravelServerImpl(
         val parsedValue = ValueParser().parseValue(event.value)
         sendData(sender, TimeTravelEventValue(eventId = eventId, value = parsedValue))
         if(event.type == StoreEventType.INTENT){
-            sendData(sender,controller.getStore(event.storeName).exposedFunctions)
+            sendData(sender,controller.getStore(event.storeName).exposedFunctionsSignature)
         }
     }
 

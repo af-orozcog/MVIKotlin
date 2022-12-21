@@ -51,6 +51,39 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         return stores[name]!!
     }
 
+    @MainThread
+    override fun applyFunction(eventId: Long, functionName: String, arguments: List<Pair<String, Any>>) {
+        var index = state.events.getOrNull(state.selectedListEventIndex)?.indexOfFirst { element -> element.id == eventId }?: -1
+        if(index == -1 || state.events[state.selectedListEventIndex][index].type != StoreEventType.INTENT){
+            return
+        }
+        val functions = getStore(state.events[state.selectedListEventIndex][index].storeName).exposedFunctions
+        if(!functions.containsKey(functionName)){
+            return
+        }
+        index -= 1
+        if(index != -1 && index > state.selectedEventIndex){
+            move(state.events,state.selectedListEventIndex,state.selectedEventIndex,index)
+        }
+        else if(index != -1 && index < state.selectedEventIndex){
+            move(state.events,state.selectedListEventIndex,index,state.selectedEventIndex)
+        }
+        else if(index == -1 && state.selectedEventIndex != -1){
+            moveToStart()
+        }
+
+        addNewEventsList(0,index)
+        functions[functionName]?.let { it(arguments) }
+    }
+
+    private fun addNewEventsList(fromEvent: Int = 0, toEvent: Int){
+        var toAdd: List<TimeTravelEvent> = emptyList()
+        for (i in fromEvent..toEvent){
+            toAdd = toAdd + state.events[state.selectedListEventIndex][i]
+        }
+        swapState { it.copy(events = listOf(*it.events.toTypedArray(), toAdd), selectedListEventIndex = it.selectedListEventIndex + 1, selectedEventIndex = toAdd.size - 1) }
+    }
+
     private fun addStore(store: TimeTravelStore<*, *, *>, name: String) {
         stores[name] = store
         store.events(

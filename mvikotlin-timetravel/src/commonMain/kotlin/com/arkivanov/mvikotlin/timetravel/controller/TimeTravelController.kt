@@ -92,6 +92,10 @@ interface TimeTravelController {
     @MainThread
     fun getStore(name:String): TimeTravelStore<*, *, *>
 
+    @MainThread
+    fun applyFunction(eventId: Long, functionName: String, arguments: List<Pair<String, Any>>)
+
+
     /**
      * Fires a [TimeTravelEvent] allowing its debugging.
      * Please note that events of type [StoreEventType.STATE] can not be debugged.
