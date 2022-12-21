@@ -87,7 +87,7 @@ class TimeTravelView(
         val selectedIndex = functionsList.selectedIndex
         functionsModel.clear()
         functions.forEach{
-            function -> functionsModel.addElement(function.name)
+            function -> functionsModel.addElement(function.name + ": "+ function.type)
         }
 
         functionsList.selectedIndex = selectedIndex

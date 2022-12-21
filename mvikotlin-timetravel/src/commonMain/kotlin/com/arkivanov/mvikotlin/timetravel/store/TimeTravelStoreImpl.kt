@@ -22,8 +22,8 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
     private val executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
     private val reducer: Reducer<State, Message>,
     private val onInit: (TimeTravelStore<Intent, State, Label>) -> Unit = {},
-    override val exposedFunctionsSignature:TimeTravelFunctionList,
-    override val exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
+    override var exposedFunctionsSignature:TimeTravelFunctionList,
+    override var exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
 ) : TimeTravelStore<Intent, State, Label> {
 
     private val executor = executorFactory()

@@ -112,7 +112,7 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
     /**
      * the actual functions that a user can call
      */
-    val exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
+    var exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
 
     /**
      * Subscribes the provided [Observer] of `States`.

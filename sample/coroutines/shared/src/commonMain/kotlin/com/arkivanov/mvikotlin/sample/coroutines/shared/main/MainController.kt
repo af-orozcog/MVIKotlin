@@ -11,6 +11,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import com.arkivanov.mvikotlin.sample.coroutines.shared.TodoDispatchers
 import com.arkivanov.mvikotlin.sample.coroutines.shared.main.MainView.Event
+import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.AddStore
 import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.AddStoreFactory
 import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.ListStore
 import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.ListStoreFactory
@@ -38,7 +39,7 @@ class MainController(
             ).create()
         }
 
-    private val addStore =
+   private val addStore =
         instanceKeeper.getStore {
             AddStoreFactory(
                 storeFactory = storeFactory,
@@ -48,10 +49,17 @@ class MainController(
             ).create()
         }
 
+
+    fun changeText(arguments:List<Any>){
+        addStore.accept(AddStore.Intent.SetText(arguments[0] as String))
+    }
+
     init {
         bind(lifecycle, BinderLifecycleMode.CREATE_DESTROY, dispatchers.unconfined) {
             addStore.labels.mapNotNull(addLabelToListIntent) bindTo listStore
         }
+        addStore.exposedFunctions = mapOf("changeText" to ::changeText)
+
     }
 
     fun onViewCreated(view: MainView, viewLifecycle: Lifecycle) {

@@ -18,7 +18,8 @@ internal class TimeTravelSettingsStoreFactory(
             initialState = State(settings = settings.settings),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
-            exposedFunctions = TimeTravelFunctionList(emptyList())
+            exposedFunctions = emptyMap(),
+            exposedFunctionsSignature = TimeTravelFunctionList(emptyList())
         ) {}
 
     private sealed class Msg {

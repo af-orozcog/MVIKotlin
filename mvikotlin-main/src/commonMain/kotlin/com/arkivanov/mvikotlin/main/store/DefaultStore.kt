@@ -17,8 +17,8 @@ internal class DefaultStore<in Intent : Any, in Action : Any, in Message : Any, 
     private val bootstrapper: Bootstrapper<Action>?,
     private val executor: Executor<Intent, Action, State, Message, Label>,
     private val reducer: Reducer<State, Message>,
-    override val exposedFunctionsSignature: TimeTravelFunctionList,
-    override val exposedFunctions: Map<String, (arguments: List<Any>) -> Unit>,
+    override var exposedFunctionsSignature: TimeTravelFunctionList,
+    override var exposedFunctions: Map<String, (arguments: List<Any>) -> Unit>,
 ) : Store<Intent, State, Label> {
 
     private val intentSubject = PublishSubject<Intent>()
