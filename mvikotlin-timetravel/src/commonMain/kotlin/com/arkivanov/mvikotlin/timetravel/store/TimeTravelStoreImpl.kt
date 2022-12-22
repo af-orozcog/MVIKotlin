@@ -2,6 +2,7 @@ package com.arkivanov.mvikotlin.timetravel.store
 
 import com.arkivanov.mvikotlin.core.store.Bootstrapper
 import com.arkivanov.mvikotlin.core.store.Executor
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.StoreEventType
 import com.arkivanov.mvikotlin.core.utils.assertOnMainThread
@@ -21,6 +22,8 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
     private val executorFactory: () -> Executor<Intent, Action, State, Message, Label>,
     private val reducer: Reducer<State, Message>,
     private val onInit: (TimeTravelStore<Intent, State, Label>) -> Unit = {},
+    override var exposedFunctionsSignature:TimeTravelFunctionList,
+    override var exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
 ) : TimeTravelStore<Intent, State, Label> {
 
     private val executor = executorFactory()
@@ -218,4 +221,5 @@ internal class TimeTravelStoreImpl<in Intent : Any, in Action : Any, in Message 
             labelSubject.onNext(label)
         }
     }
+
 }

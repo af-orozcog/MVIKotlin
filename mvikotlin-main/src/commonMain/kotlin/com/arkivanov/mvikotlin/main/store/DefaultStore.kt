@@ -2,6 +2,7 @@ package com.arkivanov.mvikotlin.main.store
 
 import com.arkivanov.mvikotlin.core.store.Bootstrapper
 import com.arkivanov.mvikotlin.core.store.Executor
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.utils.assertOnMainThread
@@ -15,7 +16,9 @@ internal class DefaultStore<in Intent : Any, in Action : Any, in Message : Any, 
     initialState: State,
     private val bootstrapper: Bootstrapper<Action>?,
     private val executor: Executor<Intent, Action, State, Message, Label>,
-    private val reducer: Reducer<State, Message>
+    private val reducer: Reducer<State, Message>,
+    override var exposedFunctionsSignature: TimeTravelFunctionList,
+    override var exposedFunctions: Map<String, (arguments: List<Any>) -> Unit>,
 ) : Store<Intent, State, Label> {
 
     private val intentSubject = PublishSubject<Intent>()
@@ -101,4 +104,5 @@ internal class DefaultStore<in Intent : Any, in Action : Any, in Message : Any, 
             block()
         }
     }
+
 }

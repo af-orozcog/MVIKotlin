@@ -195,7 +195,11 @@ class TimeTravelToolWindow(
         }
 
         override fun onEventSelected(index: Int) {
-            client.onEventSelected(listIndex = 0, eventIndex = index)
+            client.onEventSelected(eventIndex = index)
+        }
+
+        override fun onApplyFunction(functionName: String, arguments: List<Pair<String, Any>>) {
+            client.onApplyFunction(functionName = functionName, arguments = arguments)
         }
 
         override fun onSettings() {
@@ -205,6 +209,8 @@ class TimeTravelToolWindow(
         override fun onReplicateEvents() {
             client.onReplicateEventsClicked()
         }
+
+
     }
 }
 

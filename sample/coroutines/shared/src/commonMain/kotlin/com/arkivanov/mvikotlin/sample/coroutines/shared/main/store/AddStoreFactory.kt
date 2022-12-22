@@ -10,9 +10,12 @@ import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.AddStore.Labe
 import com.arkivanov.mvikotlin.sample.coroutines.shared.main.store.AddStore.State
 import com.arkivanov.mvikotlin.sample.database.TodoDatabase
 import com.arkivanov.mvikotlin.sample.database.TodoItem
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelparametersignature.TimeTravelParameterSignature
 
 internal class AddStoreFactory(
     private val storeFactory: StoreFactory,
@@ -21,13 +24,23 @@ internal class AddStoreFactory(
     private val ioContext: CoroutineContext,
 ) {
 
-    fun create(): AddStore =
-        object : AddStore, Store<Intent, State, Label> by storeFactory.create(
+    fun create(): AddStore {
+        val ans = object : AddStore, Store<Intent, State, Label> by storeFactory.create(
             name = "TodoAddStore",
             initialState = State(),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl,
+            exposedFunctionsSignature = TimeTravelFunctionList(listOf(TimeTravelFunction("changeText","change the text in the bar",listOf(
+                TimeTravelParameterSignature("text","String")
+            )))),
+            exposedFunctions = emptyMap()
         ) {}
+        fun changeText(arguments:List<Any>){
+            ans.accept(Intent.SetText(arguments[0] as String))
+        }
+        ans.exposedFunctions = mapOf("changeText" to ::changeText)
+        return ans
+    }
 
     // Serializable only for exporting events in Time Travel, no need otherwise.
     private sealed class Msg : JvmSerializable {

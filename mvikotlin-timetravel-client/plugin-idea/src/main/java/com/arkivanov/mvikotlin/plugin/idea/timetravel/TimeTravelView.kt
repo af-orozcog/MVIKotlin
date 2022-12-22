@@ -3,6 +3,8 @@ package com.arkivanov.mvikotlin.plugin.idea.timetravel
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.timetravel.client.internal.client.TimeTravelClient.Model
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelparametersignature.TimeTravelParameterSignature
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueNode
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBList
@@ -14,6 +16,8 @@ import javax.swing.JComponent
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTree
+import javax.swing.event.ListSelectionEvent
+import javax.swing.event.ListSelectionListener
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
@@ -33,17 +37,27 @@ class TimeTravelView(
             }
         }
 
+    private var selectionListener: ListSelectionListener? = null
+
+    private val functionsModel = DefaultListModel<String>()
+    private val functionsList = JBList(functionsModel)
+
     private val treeModel = DefaultTreeModel(null)
     private val tree = JTree(treeModel)
+
+    private val centerPart = JBSplitter(false, SPLITTER_PROPORTION).apply {
+        firstComponent = JBScrollPane(list)
+        secondComponent = JBScrollPane(tree)
+    }
 
     val content: JComponent =
         JPanel(BorderLayout()).apply {
             add(toolbar.component, BorderLayout.NORTH)
 
             add(
-                JBSplitter(false, SPLITTER_PROPORTION).apply {
-                    firstComponent = JBScrollPane(list)
-                    secondComponent = JBScrollPane(tree)
+                JBSplitter(true, SPLITTER_PROPORTION).apply {
+                    firstComponent = centerPart
+                    secondComponent = JBScrollPane(functionsList)
                 },
                 BorderLayout.CENTER
             )
@@ -57,6 +71,7 @@ class TimeTravelView(
             diff(get = Model::selectedEventIndex, set = ::renderSelectedEventIndex)
             diff(get = Model::selectedEventValue, set = ::renderSelectedEventValue)
             diff(get = Model::errorText, set = ::renderError)
+            diff(get = Model::exposedFunctions, set = ::renderExposedFunctions)
         }
 
     fun render(model: Model) {
@@ -71,6 +86,29 @@ class TimeTravelView(
         }
         list.selectedIndex = selectedIndex
         list.updateUI()
+    }
+
+    private fun renderExposedFunctions(functions: List<TimeTravelFunction>) {
+        val selectedIndex1 = functionsList.selectedIndex
+        functionsModel.clear()
+        functions.forEach{
+            function -> functionsModel.addElement(function.name + ": "+ function.type)
+        }
+
+        if(selectionListener != null){
+            functionsList.removeListSelectionListener(selectionListener)
+
+            selectionListener = customListener(functions,listener)
+            functionsList.addListSelectionListener(selectionListener)
+
+        }
+        else{
+            selectionListener = customListener(functions,listener)
+            functionsList.addListSelectionListener(selectionListener)
+        }
+
+        functionsList.selectedIndex = selectedIndex1
+        functionsList.updateUI()
     }
 
     private fun renderCurrentEventIndex(selectedEventIndex: Int) {
@@ -108,7 +146,28 @@ class TimeTravelView(
         private const val SPLITTER_PROPORTION = 0.4F
     }
 
+    class customListener(private val functions: List<TimeTravelFunction>,private val listener: Listener):ListSelectionListener{
+        override fun valueChanged(p0: ListSelectionEvent?) {
+            if(p0 == null) return
+            //showErrorDialog(text = "what is the size: "+functions.size+" and index: " + p0.firstIndex)
+            if(functions.size <= p0?.firstIndex!!) return
+            var toSend = createFunctionsParams(functions[p0?.firstIndex!!].parameters)
+            listener.onApplyFunction(functions[p0?.firstIndex!!].name,toSend)
+        }
+
+        private fun createFunctionsParams(parameters: List<TimeTravelParameterSignature>):List<Pair<String,Any>>{
+            var answer:List<Pair<String,Any>> = emptyList()
+            for(signature in parameters){
+                val toAdd = JOptionPane.showInputDialog(null, "name: "+signature.name+",type: "+signature.type, "Parameter", JOptionPane.QUESTION_MESSAGE);
+                answer = answer + Pair(signature.type,toAdd as Any)
+            }
+
+            return answer
+        }
+    }
+
     interface Listener : TimeTravelToolbar.Listener {
         fun onEventSelected(index: Int)
+        fun onApplyFunction(functionName:String,arguments:List<Pair<String,Any>>)
     }
 }

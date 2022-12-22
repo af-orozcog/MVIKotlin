@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.annotations.MainThread
 import com.arkivanov.mvikotlin.rx.Disposable
 import com.arkivanov.mvikotlin.rx.Observer
 import kotlin.js.JsName
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 
 /**
  * `Store` is a place for business logic, it consumes `Intents` and produces `States`.
@@ -104,6 +105,16 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
     val isDisposed: Boolean
 
     /**
+     * Returns the functions and the signatures
+     */
+    val exposedFunctionsSignature:TimeTravelFunctionList
+
+    /**
+     * the actual functions that a user can call
+     */
+    var exposedFunctions:Map<String,(arguments:List<Any>) -> Unit>
+
+    /**
      * Subscribes the provided [Observer] of `States`.
      * Can be called on any thread.
      * The first emission with the current `State` will be performed synchronously on subscription, on the calling thread.
@@ -149,4 +160,5 @@ interface Store<in Intent : Any, out State : Any, out Label : Any> {
      */
     @MainThread
     fun dispose()
+
 }

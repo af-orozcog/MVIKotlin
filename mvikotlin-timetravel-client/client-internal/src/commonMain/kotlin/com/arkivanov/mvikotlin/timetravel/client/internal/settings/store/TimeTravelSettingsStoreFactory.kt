@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.reaktive.ReaktiveExecutor
 import com.arkivanov.mvikotlin.timetravel.client.internal.settings.store.TimeTravelSettingsStore.Intent
 import com.arkivanov.mvikotlin.timetravel.client.internal.settings.store.TimeTravelSettingsStore.State
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 
 internal class TimeTravelSettingsStoreFactory(
     private val storeFactory: StoreFactory,
@@ -16,7 +17,9 @@ internal class TimeTravelSettingsStoreFactory(
         object : TimeTravelSettingsStore, Store<Intent, State, Nothing> by storeFactory.create(
             initialState = State(settings = settings.settings),
             executorFactory = ::ExecutorImpl,
-            reducer = ReducerImpl
+            reducer = ReducerImpl,
+            exposedFunctions = emptyMap(),
+            exposedFunctionsSignature = TimeTravelFunctionList(emptyList())
         ) {}
 
     private sealed class Msg {

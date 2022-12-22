@@ -11,6 +11,8 @@ import com.arkivanov.mvikotlin.timetravel.client.internal.client.store.TimeTrave
 import com.arkivanov.mvikotlin.timetravel.client.internal.client.store.TimeTravelClientStore.State.Connection
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.TimeTravelCommand
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetraveleventsupdate.TimeTravelEventsUpdate
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelstateupdate.TimeTravelStateUpdate
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueNode
 import com.badoo.reaktive.disposable.Disposable
@@ -27,7 +29,9 @@ internal class TimeTravelClientStoreFactory(
         object : TimeTravelClientStore, Store<Intent, State, Label> by storeFactory.create(
             initialState = State(),
             executorFactory = ::ExecutorImpl,
-            reducer = ReducerImpl
+            reducer = ReducerImpl,
+            exposedFunctions = emptyMap(),
+            exposedFunctionsSignature = TimeTravelFunctionList(emptyList())
         ) {}
 
     private sealed class Msg {
@@ -38,6 +42,7 @@ internal class TimeTravelClientStoreFactory(
         data class EventSelected(val listIndex: Int, val eventIndex: Int) : Msg()
         data class EventValue(val eventId: Long, val value: ValueNode) : Msg()
         data class ErrorChanged(val text: String?) : Msg()
+        data class ExposedFunctions(val functions:List<TimeTravelFunction>): Msg()
     }
 
     private inner class ExecutorImpl : ReaktiveExecutor<Intent, Nothing, State, Msg, Label>() {
@@ -58,6 +63,7 @@ internal class TimeTravelClientStoreFactory(
                 is Intent.ExportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ExportEvents }
                 is Intent.ImportEvents -> sendIfNeeded(getState()) { TimeTravelCommand.ImportEvents(intent.data) }
                 is Intent.DismissError -> dispatch(Msg.ErrorChanged(text = null))
+                is Intent.ApplyFunction -> applyFunction(listIndex = intent.listIndex, eventIndex = intent.eventIndex, functionName = intent.functionName, arguments = intent.arguments, state = getState())
             }
 
         private fun connectIfNeeded(state: State): Unit =
@@ -80,6 +86,7 @@ internal class TimeTravelClientStoreFactory(
                 is Connector.Event.Connected -> dispatch(Msg.Connected(event.writer))
                 is Connector.Event.StateUpdate -> dispatch(Msg.StateUpdate(event.stateUpdate))
                 is Connector.Event.EventValue -> dispatch(Msg.EventValue(eventId = event.eventId, value = event.value))
+                is Connector.Event.ExposedFunctions -> dispatch(Msg.ExposedFunctions(functions = event.functions))
                 is Connector.Event.ExportEvents -> publish(Label.ExportEvents(event.data))
                 is Connector.Event.Error -> dispatch(Msg.ErrorChanged(text = event.text))
             }
@@ -129,6 +136,19 @@ internal class TimeTravelClientStoreFactory(
                     }
             }
         }
+
+        private fun applyFunction(listIndex: Int, eventIndex: Int, functionName: String, arguments: List<Pair<String, Any>>, state: State) {
+            sendIfNeeded(state) {
+                events
+                    .getOrNull(listIndex)
+                    ?.getOrNull(eventIndex)
+                    ?.id
+                    ?.let{
+                        (TimeTravelCommand::ApplyFunction)(it,functionName,arguments)
+                    }
+            }
+        }
+
     }
 
     private object ReducerImpl : Reducer<State, Msg> {
@@ -139,6 +159,7 @@ internal class TimeTravelClientStoreFactory(
                 is Msg.Disconnected -> copy(connection = Connection.Disconnected)
                 is Msg.StateUpdate -> copy(connection = connection.applyStateUpdate(msg))
                 is Msg.EventSelected -> copy(connection = connection.applyEventSelected(msg))
+                is Msg.ExposedFunctions -> copy(connection = connection.applyExposedFunctions(msg))
                 is Msg.EventValue -> copy(connection = connection.applyEventValue(msg))
                 is Msg.ErrorChanged -> copy(errorText = msg.text)
             }
@@ -203,7 +224,14 @@ internal class TimeTravelClientStoreFactory(
             when (this) {
                 is Connection.Disconnected,
                 is Connection.Connecting -> this
-                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex)
+                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex, currentEventIndex = msg.eventIndex)
+            }
+
+        private fun Connection.applyExposedFunctions(msg: Msg.ExposedFunctions): Connection =
+            when (this) {
+                is Connection.Disconnected,
+                is Connection.Connecting -> this
+                is Connection.Connected -> copy(exposedFunctions = msg.functions)
             }
 
         private fun Connection.applyEventValue(msg: Msg.EventValue): Connection =

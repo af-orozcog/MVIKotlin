@@ -1,5 +1,6 @@
 package com.arkivanov.mvikotlin.timetravel.client.internal.client
 
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunction.TimeTravelFunction
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueNode
 import com.badoo.reaktive.subject.behavior.BehaviorObservable
 
@@ -17,14 +18,16 @@ interface TimeTravelClient {
     fun onMoveToEndClicked()
     fun onCancelClicked()
     fun onDebugEventClicked()
-    fun onEventSelected(listIndex: Int, eventIndex: Int)
+    fun onEventSelected(eventIndex: Int)
     fun onExportEventsClicked()
     fun onImportEventsClicked()
     fun onDismissErrorClicked()
     fun onReplicateEventsClicked()
+    fun onApplyFunction(functionName:String, arguments:List<Pair<String,Any>>)
 
     data class Model(
         val events: List<List<String>>,
+        val exposedFunctions: List<TimeTravelFunction>,
         val currentEventIndex: Int,
         val buttons: Buttons,
         val selectedEventListIndex: Int,

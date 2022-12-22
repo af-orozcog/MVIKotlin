@@ -18,6 +18,7 @@ kotlin {
         common.main.dependencies {
             implementation(project(":mvikotlin"))
             implementation(project(":utils-internal"))
+            implementation(project(":mvikotlin-timetravel-proto-internal"))
         }
 
         common.test.dependencies {

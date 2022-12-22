@@ -16,4 +16,5 @@ sealed class TimeTravelCommand : ProtoObject {
     object ExportEvents : TimeTravelCommand()
     class ImportEvents(val data: ByteArray) : TimeTravelCommand()
     object ReplicateEvents : TimeTravelCommand()
+    data class ApplyFunction(val eventId: Long, val functionName:String, val arguments:List<Pair<String,Any>>) : TimeTravelCommand()
 }

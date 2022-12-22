@@ -24,7 +24,8 @@ private fun emptyModel(buttons: Model.Buttons, errorText: String?): Model =
         selectedEventListIndex = -1,
         selectedEventIndex = -1,
         selectedEventValue = null,
-        errorText = errorText
+        errorText = errorText,
+        exposedFunctions = emptyList()
     )
 
 private fun connectedModel(connection: State.Connection.Connected, errorText: String?): Model =
@@ -35,7 +36,8 @@ private fun connectedModel(connection: State.Connection.Connected, errorText: St
         selectedEventListIndex = connection.selectedEventListIndex,
         selectedEventIndex = connection.selectedEventIndex,
         selectedEventValue = connection.events.getOrNull(connection.selectedEventListIndex)?.getOrNull(connection.selectedEventIndex)?.let { it.value ?: ValueNode(type = "...") },
-        errorText = errorText
+        errorText = errorText,
+        exposedFunctions = connection.exposedFunctions
     )
 
 private val TimeTravelEvent.text: String get() = "[$storeName]: ${type.title}.$valueType"

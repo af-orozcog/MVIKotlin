@@ -1,5 +1,6 @@
 package com.arkivanov.mvikotlin.timetravel.server
 
+import com.arkivanov.mvikotlin.core.store.StoreEventType
 import com.arkivanov.mvikotlin.rx.Disposable
 import com.arkivanov.mvikotlin.rx.observer
 import com.arkivanov.mvikotlin.timetravel.controller.TimeTravelController
@@ -8,6 +9,7 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.ProtoObject
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetraveleventvalue.TimeTravelEventValue
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.TimeTravelCommand
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelexport.TimeTravelExport
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueParser
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ReaderThread
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.WriterThread
@@ -107,7 +109,8 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.AnalyzeEvent -> analyzeEvent(listIndex = command.listIndex, eventId = command.eventId, sender = sender)
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
-                is TimeTravelCommand.ReplicateEvents -> controller.replicateEvents()
+                is TimeTravelCommand.ReplicateEvents -> Unit
+                is TimeTravelCommand.ApplyFunction -> controller.applyFunction(eventId = command.eventId, functionName = command.functionName, arguments = command.arguments)
             }.let {}
         }
     }
@@ -116,6 +119,12 @@ internal class TimeTravelServerImpl(
         val event = controller.state.events.getOrNull(listIndex)?.firstOrNull { it.id == eventId } ?: return
         val parsedValue = ValueParser().parseValue(event.value)
         sendData(sender, TimeTravelEventValue(eventId = eventId, value = parsedValue))
+        if(event.type == StoreEventType.INTENT){
+            sendData(sender,controller.getStore(event.storeName).exposedFunctionsSignature)
+        }
+        else{
+            sendData(sender,TimeTravelFunctionList(emptyList()))
+        }
     }
 
     private fun exportEvents(sender: Socket) {

@@ -11,6 +11,9 @@ plugins {
     id("com.android.library")
     id("com.arkivanov.gradle.setup")
 }
+dependencies {
+    implementation(project(mapOf("path" to ":mvikotlin-timetravel-proto-internal")))
+}
 
 setupMultiplatform {
     android()
@@ -35,6 +38,7 @@ kotlin {
                 export(project(":mvikotlin-main"))
                 export(project(":mvikotlin-logging"))
                 export(project(":mvikotlin-timetravel"))
+                export(project(":mvikotlin-timetravel-proto-internal"))
             }
         }
 
@@ -47,6 +51,7 @@ kotlin {
         common.main.dependencies {
             api(project(":mvikotlin"))
             implementation(project(":mvikotlin-extensions-coroutines"))
+            implementation(project(":mvikotlin-timetravel-proto-internal"))
             api(project(":sample:database"))
             api(deps.kotlinx.kotlinxCoroutinesCore)
             api(deps.essenty.lifecycle)

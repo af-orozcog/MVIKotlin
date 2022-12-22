@@ -36,6 +36,7 @@ kotlin {
                 export(project(":mvikotlin-main"))
                 export(project(":mvikotlin-logging"))
                 export(project(":mvikotlin-timetravel"))
+                export(project(":mvikotlin-timetravel-proto-internal"))
             }
         }
 
@@ -52,6 +53,7 @@ kotlin {
             api(deps.reaktive.reaktive)
             api(deps.essenty.lifecycle)
             api(deps.essenty.instanceKeeper)
+            implementation(project(":mvikotlin-timetravel-proto-internal"))
         }
 
         common.test.dependencies {

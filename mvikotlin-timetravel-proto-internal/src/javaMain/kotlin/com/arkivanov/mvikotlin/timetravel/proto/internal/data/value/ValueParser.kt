@@ -10,7 +10,8 @@ actual class ValueParser actual constructor() {
 
     private val visitedObjects = HashSet<Any>()
 
-    actual fun parseValue(obj: Any): ValueNode {
+    actual fun
+        parseValue(obj: Any): ValueNode {
         visitedObjects.clear()
 
         return value(value = obj)
