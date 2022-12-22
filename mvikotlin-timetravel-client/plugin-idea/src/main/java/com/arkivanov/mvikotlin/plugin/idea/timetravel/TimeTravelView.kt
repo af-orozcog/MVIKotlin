@@ -37,6 +37,8 @@ class TimeTravelView(
             }
         }
 
+    private val pastEvents = PastEventsView(emptyList())
+
     private var selectionListener: ListSelectionListener? = null
 
     private val functionsModel = DefaultListModel<String>()
@@ -50,6 +52,11 @@ class TimeTravelView(
         secondComponent = JBScrollPane(tree)
     }
 
+    private val lowPart = JBSplitter(false, SPLITTER_PROPORTION).apply {
+        firstComponent = JBScrollPane(functionsList)
+        secondComponent = JBScrollPane(pastEvents.component)
+    }
+
     val content: JComponent =
         JPanel(BorderLayout()).apply {
             add(toolbar.component, BorderLayout.NORTH)
@@ -57,7 +64,7 @@ class TimeTravelView(
             add(
                 JBSplitter(true, SPLITTER_PROPORTION).apply {
                     firstComponent = centerPart
-                    secondComponent = JBScrollPane(functionsList)
+                    secondComponent = lowPart
                 },
                 BorderLayout.CENTER
             )
@@ -83,6 +90,12 @@ class TimeTravelView(
         listModel.clear()
         if(events.size != 0){
             events[events.size-1].forEach(listModel::addElement)
+        }
+        if(events.size > 1){
+            pastEvents.updateTable(events.subList(0,events.size-1))
+        }
+        else{
+            pastEvents.updateTable(emptyList())
         }
         list.selectedIndex = selectedIndex
         list.updateUI()
