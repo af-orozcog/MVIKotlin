@@ -142,7 +142,6 @@ internal class TimeTravelClientStoreFactory(
                 events
                     .getOrNull(listIndex)
                     ?.getOrNull(eventIndex)
-                    ?.takeIf { it.value == null }
                     ?.id
                     ?.let{
                         (TimeTravelCommand::ApplyFunction)(it,functionName,arguments)
@@ -225,7 +224,7 @@ internal class TimeTravelClientStoreFactory(
             when (this) {
                 is Connection.Disconnected,
                 is Connection.Connecting -> this
-                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex)
+                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex, currentEventIndex = msg.eventIndex)
             }
 
         private fun Connection.applyExposedFunctions(msg: Msg.ExposedFunctions): Connection =

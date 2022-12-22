@@ -9,6 +9,7 @@ import com.arkivanov.mvikotlin.timetravel.proto.internal.data.ProtoObject
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetraveleventvalue.TimeTravelEventValue
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelcomand.TimeTravelCommand
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelexport.TimeTravelExport
+import com.arkivanov.mvikotlin.timetravel.proto.internal.data.timetravelfunctionlist.TimeTravelFunctionList
 import com.arkivanov.mvikotlin.timetravel.proto.internal.data.value.ValueParser
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.ReaderThread
 import com.arkivanov.mvikotlin.timetravel.proto.internal.io.WriterThread
@@ -120,6 +121,9 @@ internal class TimeTravelServerImpl(
         sendData(sender, TimeTravelEventValue(eventId = eventId, value = parsedValue))
         if(event.type == StoreEventType.INTENT){
             sendData(sender,controller.getStore(event.storeName).exposedFunctionsSignature)
+        }
+        else{
+            sendData(sender,TimeTravelFunctionList(emptyList()))
         }
     }
 

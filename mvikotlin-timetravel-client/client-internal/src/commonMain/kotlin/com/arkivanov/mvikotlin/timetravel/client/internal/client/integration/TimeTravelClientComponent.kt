@@ -81,8 +81,8 @@ class TimeTravelClientComponent(
         store.accept(Intent.DebugEvent)
     }
 
-    override fun onEventSelected(listIndex: Int, eventIndex: Int) {
-        store.accept(Intent.SelectEvent(listIndex = listIndex, eventIndex = eventIndex))
+    override fun onEventSelected(eventIndex: Int) {
+        store.accept(Intent.SelectEvent(listIndex = models.value.selectedEventListIndex, eventIndex = eventIndex))
     }
 
     override fun onExportEventsClicked() {
@@ -103,7 +103,7 @@ class TimeTravelClientComponent(
         store.accept(Intent.ReplicateEvents)
     }
 
-    override fun onSelectedMethod(functionName: String, arguments: List<Pair<String, Any>>) {
+    override fun onApplyFunction(functionName: String, arguments: List<Pair<String, Any>>) {
         store.accept(Intent.ApplyFunction(listIndex = models.value.selectedEventListIndex, eventIndex = models.value.currentEventIndex, functionName = functionName, arguments = arguments))
     }
 }

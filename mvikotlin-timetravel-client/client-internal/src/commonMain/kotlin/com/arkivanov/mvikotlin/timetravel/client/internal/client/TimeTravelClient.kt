@@ -18,12 +18,12 @@ interface TimeTravelClient {
     fun onMoveToEndClicked()
     fun onCancelClicked()
     fun onDebugEventClicked()
-    fun onEventSelected(listIndex: Int, eventIndex: Int)
+    fun onEventSelected(eventIndex: Int)
     fun onExportEventsClicked()
     fun onImportEventsClicked()
     fun onDismissErrorClicked()
     fun onReplicateEventsClicked()
-    fun onSelectedMethod(functionName:String, arguments:List<Pair<String,Any>>)
+    fun onApplyFunction(functionName:String, arguments:List<Pair<String,Any>>)
 
     data class Model(
         val events: List<List<String>>,

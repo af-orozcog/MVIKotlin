@@ -73,7 +73,7 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         }
 
         addNewEventsList(0,index)
-        functions[functionName]?.let { it(arguments) }
+        functions[functionName]?.let { it(arguments.map{ it -> it.second}) }
     }
 
     private fun addNewEventsList(fromEvent: Int = 0, toEvent: Int){
