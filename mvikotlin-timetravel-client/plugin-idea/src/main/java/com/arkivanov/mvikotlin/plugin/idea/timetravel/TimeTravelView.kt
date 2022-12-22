@@ -89,26 +89,18 @@ class TimeTravelView(
     }
 
     private fun renderExposedFunctions(functions: List<TimeTravelFunction>) {
-        val selectedIndex1 = functionsList.selectedIndex
+        if(selectionListener != null){
+            functionsList.removeListSelectionListener(selectionListener)
+        }
         functionsModel.clear()
         functions.forEach{
             function -> functionsModel.addElement(function.name + ": "+ function.type)
         }
 
-        if(selectionListener != null){
-            functionsList.removeListSelectionListener(selectionListener)
-
-            selectionListener = customListener(functions,listener)
-            functionsList.addListSelectionListener(selectionListener)
-
-        }
-        else{
-            selectionListener = customListener(functions,listener)
-            functionsList.addListSelectionListener(selectionListener)
-        }
-
-        functionsList.selectedIndex = selectedIndex1
         functionsList.updateUI()
+        selectionListener = customListener(functions,listener,functionsList)
+        functionsList.addListSelectionListener(selectionListener)
+
     }
 
     private fun renderCurrentEventIndex(selectedEventIndex: Int) {
@@ -146,13 +138,15 @@ class TimeTravelView(
         private const val SPLITTER_PROPORTION = 0.4F
     }
 
-    class customListener(private val functions: List<TimeTravelFunction>,private val listener: Listener):ListSelectionListener{
+    class customListener(private val functions: List<TimeTravelFunction>,private val listener: Listener,private val functionsList: JBList<String>):ListSelectionListener{
         override fun valueChanged(p0: ListSelectionEvent?) {
             if(p0 == null) return
-            //showErrorDialog(text = "what is the size: "+functions.size+" and index: " + p0.firstIndex)
             if(functions.size <= p0?.firstIndex!!) return
             var toSend = createFunctionsParams(functions[p0?.firstIndex!!].parameters)
             listener.onApplyFunction(functions[p0?.firstIndex!!].name,toSend)
+            functionsList.removeListSelectionListener(this)
+            functionsList.selectedIndex = -1
+            functionsList.updateUI()
         }
 
         private fun createFunctionsParams(parameters: List<TimeTravelParameterSignature>):List<Pair<String,Any>>{
