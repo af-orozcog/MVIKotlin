@@ -37,7 +37,7 @@ private fun connectedModel(connection: State.Connection.Connected, errorText: St
         selectedEventListIndex = connection.selectedEventListIndex,
         selectedEventIndex = connection.selectedEventIndex,
         selectedEventValue = connection.events.getOrNull(connection.selectedEventListIndex)?.getOrNull(connection.selectedEventIndex)?.let { it.value ?: ValueNode(type = "...") },
-        currentEventListIndex = connection.selectedEventListIndex,
+        currentEventListIndex = connection.currentEventListIndex,
         errorText = errorText,
         exposedFunctions = connection.exposedFunctions
     )

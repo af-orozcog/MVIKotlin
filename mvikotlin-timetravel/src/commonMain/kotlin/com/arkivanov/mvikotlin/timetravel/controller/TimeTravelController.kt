@@ -93,7 +93,7 @@ interface TimeTravelController {
     fun getStore(name:String): TimeTravelStore<*, *, *>
 
     @MainThread
-    fun applyFunction(eventId: Long, functionName: String, arguments: List<Pair<String, Any>>)
+    fun applyFunction(listIndex: Int, eventId: Long, functionName: String, arguments: List<Pair<String, Any>>)
 
 
     /**

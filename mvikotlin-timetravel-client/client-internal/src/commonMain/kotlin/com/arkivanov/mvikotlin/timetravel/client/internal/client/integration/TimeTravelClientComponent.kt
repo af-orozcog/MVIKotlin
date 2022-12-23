@@ -108,6 +108,6 @@ class TimeTravelClientComponent(
     }
 
     override fun onApplyFunction(functionName: String, arguments: List<Pair<String, Any>>) {
-        store.accept(Intent.ApplyFunction(listIndex = models.value.selectedEventListIndex, eventIndex = models.value.currentEventIndex, functionName = functionName, arguments = arguments))
+        store.accept(Intent.ApplyFunction(listIndex = models.value.currentEventListIndex, eventIndex = models.value.currentEventIndex, functionName = functionName, arguments = arguments))
     }
 }

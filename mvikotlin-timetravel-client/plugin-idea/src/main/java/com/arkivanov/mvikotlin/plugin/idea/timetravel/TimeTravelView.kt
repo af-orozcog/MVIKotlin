@@ -37,7 +37,7 @@ class TimeTravelView(
             }
         }
 
-    private val pastEvents = PastEventsView(emptyList(),listener)
+    private val pastEvents = PastEventsView()
 
     private var selectionListener: ListSelectionListener? = null
 
@@ -73,9 +73,7 @@ class TimeTravelView(
     private val renderer: ViewRenderer<Model> =
         diff {
             diff(get = Model::events, set = ::renderEvents)
-            diff(get = Model::currentEventIndex, set = ::renderCurrentEventIndex)
             diff(get = Model::buttons, set = toolbar::render)
-            diff(get = Model::selectedEventIndex, set = ::renderSelectedEventIndex)
             diff(get = Model::selectedEventValue, set = ::renderSelectedEventValue)
             diff(get = Model::errorText, set = ::renderError)
             diff(get = Model::exposedFunctions, set = ::renderExposedFunctions)
@@ -86,18 +84,28 @@ class TimeTravelView(
     }
 
     private fun renderEvents(events: List<List<String>>) {
-        val selectedIndex = list.selectedIndex
+        val selectedIndex1 = list.selectedIndex
         listModel.clear()
         if(events.size != 0){
             events[events.size-1].forEach(listModel::addElement)
         }
+        pastEvents.removeAllComponents()
         if(events.size > 1){
-            pastEvents.updateTable(events.subList(0,events.size-1))
+            var toUse = events.subList(0,events.size-1)
+            for(i in toUse.size-1 downTo 0){
+                val listModel = DefaultListModel<String>()
+                val list = JBList(listModel).apply{
+                    this.layoutOrientation = JBList.HORIZONTAL_WRAP
+                    addListSelectionListener {
+                        listener.onEventSelected(listIndex = i, index = selectedIndex)
+                    }
+                }
+                toUse[i].forEach(listModel::addElement)
+                pastEvents.addRow(JBScrollPane(list))
+            }
         }
-        else{
-            pastEvents.updateTable(emptyList())
-        }
-        list.selectedIndex = selectedIndex
+
+        list.selectedIndex = selectedIndex1
         list.updateUI()
     }
 
@@ -114,20 +122,6 @@ class TimeTravelView(
         selectionListener = customListener(functions,listener,functionsList)
         functionsList.addListSelectionListener(selectionListener)
 
-    }
-
-    private fun renderCurrentEventIndex(selectedEventIndex: Int) {
-        list.cellRenderer =
-            DefaultListRenderer(
-                TimeTravelEventComponentProvider(
-                    font = list.font,
-                    selectedEventIndex = selectedEventIndex
-                )
-            )
-    }
-
-    private fun renderSelectedEventIndex(index: Int) {
-        list.selectedIndex = index
     }
 
     private fun renderSelectedEventValue(value: ValueNode?) {
