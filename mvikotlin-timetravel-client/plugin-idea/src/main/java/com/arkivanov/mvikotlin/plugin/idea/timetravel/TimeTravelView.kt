@@ -37,6 +37,8 @@ class TimeTravelView(
             }
         }
 
+    private val pastEvents = PastEventsView()
+
     private var selectionListener: ListSelectionListener? = null
 
     private val functionsModel = DefaultListModel<String>()
@@ -50,6 +52,11 @@ class TimeTravelView(
         secondComponent = JBScrollPane(tree)
     }
 
+    private val lowPart = JBSplitter(false, SPLITTER_PROPORTION).apply {
+        firstComponent = JBScrollPane(functionsList)
+        secondComponent = JBScrollPane(pastEvents.component)
+    }
+
     val content: JComponent =
         JPanel(BorderLayout()).apply {
             add(toolbar.component, BorderLayout.NORTH)
@@ -57,7 +64,7 @@ class TimeTravelView(
             add(
                 JBSplitter(true, SPLITTER_PROPORTION).apply {
                     firstComponent = centerPart
-                    secondComponent = JBScrollPane(functionsList)
+                    secondComponent = lowPart
                 },
                 BorderLayout.CENTER
             )
@@ -66,9 +73,7 @@ class TimeTravelView(
     private val renderer: ViewRenderer<Model> =
         diff {
             diff(get = Model::events, set = ::renderEvents)
-            diff(get = Model::currentEventIndex, set = ::renderCurrentEventIndex)
             diff(get = Model::buttons, set = toolbar::render)
-            diff(get = Model::selectedEventIndex, set = ::renderSelectedEventIndex)
             diff(get = Model::selectedEventValue, set = ::renderSelectedEventValue)
             diff(get = Model::errorText, set = ::renderError)
             diff(get = Model::exposedFunctions, set = ::renderExposedFunctions)
@@ -79,50 +84,44 @@ class TimeTravelView(
     }
 
     private fun renderEvents(events: List<List<String>>) {
-        val selectedIndex = list.selectedIndex
+        val selectedIndex1 = list.selectedIndex
         listModel.clear()
         if(events.size != 0){
             events[events.size-1].forEach(listModel::addElement)
         }
-        list.selectedIndex = selectedIndex
+        pastEvents.removeAllComponents()
+        if(events.size > 1){
+            var toUse = events.subList(0,events.size-1)
+            for(i in toUse.size-1 downTo 0){
+                val listModel = DefaultListModel<String>()
+                val list = JBList(listModel).apply{
+                    this.layoutOrientation = JBList.HORIZONTAL_WRAP
+                    addListSelectionListener {
+                        listener.onEventSelected(listIndex = i, index = selectedIndex)
+                    }
+                }
+                toUse[i].forEach(listModel::addElement)
+                pastEvents.addRow(JBScrollPane(list))
+            }
+        }
+
+        list.selectedIndex = selectedIndex1
         list.updateUI()
     }
 
     private fun renderExposedFunctions(functions: List<TimeTravelFunction>) {
-        val selectedIndex1 = functionsList.selectedIndex
+        if(selectionListener != null){
+            functionsList.removeListSelectionListener(selectionListener)
+        }
         functionsModel.clear()
         functions.forEach{
             function -> functionsModel.addElement(function.name + ": "+ function.type)
         }
 
-        if(selectionListener != null){
-            functionsList.removeListSelectionListener(selectionListener)
-
-            selectionListener = customListener(functions,listener)
-            functionsList.addListSelectionListener(selectionListener)
-
-        }
-        else{
-            selectionListener = customListener(functions,listener)
-            functionsList.addListSelectionListener(selectionListener)
-        }
-
-        functionsList.selectedIndex = selectedIndex1
         functionsList.updateUI()
-    }
+        selectionListener = customListener(functions,listener,functionsList)
+        functionsList.addListSelectionListener(selectionListener)
 
-    private fun renderCurrentEventIndex(selectedEventIndex: Int) {
-        list.cellRenderer =
-            DefaultListRenderer(
-                TimeTravelEventComponentProvider(
-                    font = list.font,
-                    selectedEventIndex = selectedEventIndex
-                )
-            )
-    }
-
-    private fun renderSelectedEventIndex(index: Int) {
-        list.selectedIndex = index
     }
 
     private fun renderSelectedEventValue(value: ValueNode?) {
@@ -146,13 +145,15 @@ class TimeTravelView(
         private const val SPLITTER_PROPORTION = 0.4F
     }
 
-    class customListener(private val functions: List<TimeTravelFunction>,private val listener: Listener):ListSelectionListener{
+    class customListener(private val functions: List<TimeTravelFunction>,private val listener: Listener,private val functionsList: JBList<String>):ListSelectionListener{
         override fun valueChanged(p0: ListSelectionEvent?) {
             if(p0 == null) return
-            //showErrorDialog(text = "what is the size: "+functions.size+" and index: " + p0.firstIndex)
             if(functions.size <= p0?.firstIndex!!) return
             var toSend = createFunctionsParams(functions[p0?.firstIndex!!].parameters)
             listener.onApplyFunction(functions[p0?.firstIndex!!].name,toSend)
+            functionsList.removeListSelectionListener(this)
+            functionsList.selectedIndex = -1
+            functionsList.updateUI()
         }
 
         private fun createFunctionsParams(parameters: List<TimeTravelParameterSignature>):List<Pair<String,Any>>{
@@ -168,6 +169,7 @@ class TimeTravelView(
 
     interface Listener : TimeTravelToolbar.Listener {
         fun onEventSelected(index: Int)
+        fun onEventSelected(listIndex: Int, index:Int)
         fun onApplyFunction(functionName:String,arguments:List<Pair<String,Any>>)
     }
 }

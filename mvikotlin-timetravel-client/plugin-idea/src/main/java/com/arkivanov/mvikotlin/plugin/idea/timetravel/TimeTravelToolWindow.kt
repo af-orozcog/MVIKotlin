@@ -198,6 +198,10 @@ class TimeTravelToolWindow(
             client.onEventSelected(eventIndex = index)
         }
 
+        override fun onEventSelected(listIndex: Int, index: Int) {
+            client.onEventSelected(listIndex = listIndex, eventIndex = index)
+        }
+
         override fun onApplyFunction(functionName: String, arguments: List<Pair<String, Any>>) {
             client.onApplyFunction(functionName = functionName, arguments = arguments)
         }

@@ -110,7 +110,7 @@ internal class TimeTravelServerImpl(
                 is TimeTravelCommand.ExportEvents -> exportEvents(sender)
                 is TimeTravelCommand.ImportEvents -> importEvents(command.data)
                 is TimeTravelCommand.ReplicateEvents -> Unit
-                is TimeTravelCommand.ApplyFunction -> controller.applyFunction(eventId = command.eventId, functionName = command.functionName, arguments = command.arguments)
+                is TimeTravelCommand.ApplyFunction -> controller.applyFunction(listIndex = command.listIndex, eventId = command.eventId, functionName = command.functionName, arguments = command.arguments)
             }.let {}
         }
     }

@@ -24,6 +24,7 @@ private fun emptyModel(buttons: Model.Buttons, errorText: String?): Model =
         selectedEventListIndex = -1,
         selectedEventIndex = -1,
         selectedEventValue = null,
+        currentEventListIndex = -1,
         errorText = errorText,
         exposedFunctions = emptyList()
     )
@@ -36,6 +37,7 @@ private fun connectedModel(connection: State.Connection.Connected, errorText: St
         selectedEventListIndex = connection.selectedEventListIndex,
         selectedEventIndex = connection.selectedEventIndex,
         selectedEventValue = connection.events.getOrNull(connection.selectedEventListIndex)?.getOrNull(connection.selectedEventIndex)?.let { it.value ?: ValueNode(type = "...") },
+        currentEventListIndex = connection.currentEventListIndex,
         errorText = errorText,
         exposedFunctions = connection.exposedFunctions
     )
