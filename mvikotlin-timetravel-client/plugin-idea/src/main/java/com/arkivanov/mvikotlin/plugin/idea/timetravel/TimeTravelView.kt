@@ -37,7 +37,7 @@ class TimeTravelView(
             }
         }
 
-    private val pastEvents = PastEventsView(emptyList())
+    private val pastEvents = PastEventsView(emptyList(),listener)
 
     private var selectionListener: ListSelectionListener? = null
 
@@ -175,6 +175,7 @@ class TimeTravelView(
 
     interface Listener : TimeTravelToolbar.Listener {
         fun onEventSelected(index: Int)
+        fun onEventSelected(listIndex: Int, index:Int)
         fun onApplyFunction(functionName:String,arguments:List<Pair<String,Any>>)
     }
 }

@@ -223,7 +223,7 @@ internal class TimeTravelClientStoreFactory(
             when (this) {
                 is Connection.Disconnected,
                 is Connection.Connecting -> this
-                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex, currentEventIndex = msg.eventIndex)
+                is Connection.Connected -> copy(selectedEventListIndex = msg.listIndex, selectedEventIndex = msg.eventIndex, currentEventIndex = msg.eventIndex, currentEventListIndex = msg.listIndex)
             }
 
         private fun Connection.applyExposedFunctions(msg: Msg.ExposedFunctions): Connection =

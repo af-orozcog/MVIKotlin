@@ -19,6 +19,7 @@ interface TimeTravelClient {
     fun onCancelClicked()
     fun onDebugEventClicked()
     fun onEventSelected(eventIndex: Int)
+    fun onEventSelected(listIndex:Int, eventIndex: Int)
     fun onExportEventsClicked()
     fun onImportEventsClicked()
     fun onDismissErrorClicked()
@@ -31,6 +32,7 @@ interface TimeTravelClient {
         val currentEventIndex: Int,
         val buttons: Buttons,
         val selectedEventListIndex: Int,
+        val currentEventListIndex: Int,
         val selectedEventIndex: Int,
         val selectedEventValue: ValueNode?,
         val errorText: String?

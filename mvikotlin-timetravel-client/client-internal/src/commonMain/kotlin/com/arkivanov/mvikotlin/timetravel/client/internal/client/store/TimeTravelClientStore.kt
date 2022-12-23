@@ -48,6 +48,7 @@ internal interface TimeTravelClientStore : Store<Intent, State, Label> {
                 val currentEventIndex: Int = -1,
                 val mode: TimeTravelStateUpdate.Mode = TimeTravelStateUpdate.Mode.IDLE,
                 val selectedEventListIndex: Int = -1,
+                val currentEventListIndex: Int = -1,
                 val selectedEventIndex: Int = -1,
                 /*private*/ internal val disposable: Disposable,
                 /*private*/ internal val writer: (TimeTravelCommand) -> Unit
