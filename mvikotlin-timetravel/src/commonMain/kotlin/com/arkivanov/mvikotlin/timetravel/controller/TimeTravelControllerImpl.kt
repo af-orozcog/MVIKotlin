@@ -53,6 +53,8 @@ internal class TimeTravelControllerImpl : TimeTravelController {
 
     @MainThread
     override fun applyFunction(listIndex: Int, eventId: Long, functionName: String, arguments: List<Pair<String, Any>>) {
+        assertOnMainThread()
+
         var index = state.events.getOrNull(listIndex)?.indexOfFirst { element -> element.id == eventId }?: -1
         if(index == -1 || state.events[listIndex][index].type != StoreEventType.INTENT){
             return
@@ -63,28 +65,11 @@ internal class TimeTravelControllerImpl : TimeTravelController {
         }
         index -= 1
 
-        if(listIndex != state.selectedListEventIndex){
-            moveToStart()
-            if(index != -1)
-                move(events = state.events, listIndex = listIndex,from = 0,to = index)
-            addNewEventsList(listIndex,0,index)
-            swapState { it.copy(mode = Mode.RECORDING) }
-            functions[functionName]?.let { it(arguments.map{ it -> it.second}) }
-
-            return
-        }
-
-        if(index != -1 && index > state.selectedEventIndex){
-            move(state.events,listIndex,state.selectedEventIndex,index)
-        }
-        else if(index != -1 && index < state.selectedEventIndex){
-            move(state.events,listIndex,index,state.selectedEventIndex)
-        }
-        else if(index == -1 && state.selectedEventIndex != -1){
-            moveToStart()
-        }
-
+        move(state.events, state.selectedListEventIndex, state.selectedEventIndex, -1)
+        if(index != -1)
+            move(events = state.events, listIndex = listIndex,from = 0,to = index)
         addNewEventsList(listIndex,0,index)
+        swapState { it.copy(mode = Mode.RECORDING) }
         functions[functionName]?.let { it(arguments.map{ it -> it.second}) }
     }
 
